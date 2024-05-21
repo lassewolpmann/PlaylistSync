@@ -14,6 +14,14 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            Button {
+                Task {
+                    let request = await authorize();
+                    print(request);
+                }
+            } label: {
+                Text("Authorize MusicKit")
+            }
         }
         .padding()
     }
