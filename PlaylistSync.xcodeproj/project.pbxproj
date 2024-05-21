@@ -11,6 +11,7 @@
 		257A68AA2BFCFD080056916E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A92BFCFD080056916E /* ContentView.swift */; };
 		257A68AC2BFCFD080056916E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AB2BFCFD080056916E /* Assets.xcassets */; };
 		257A68AF2BFCFD080056916E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AE2BFCFD080056916E /* Preview Assets.xcassets */; };
+		257A68B72BFCFEAE0056916E /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68B62BFCFEAE0056916E /* Authorization.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		257A68A92BFCFD080056916E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		257A68AB2BFCFD080056916E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		257A68AE2BFCFD080056916E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		257A68B62BFCFEAE0056916E /* Authorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +53,7 @@
 		257A68A62BFCFD080056916E /* PlaylistSync */ = {
 			isa = PBXGroup;
 			children = (
+				257A68B52BFCFEA00056916E /* MusicKit */,
 				257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */,
 				257A68A92BFCFD080056916E /* ContentView.swift */,
 				257A68AB2BFCFD080056916E /* Assets.xcassets */,
@@ -65,6 +68,14 @@
 				257A68AE2BFCFD080056916E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		257A68B52BFCFEA00056916E /* MusicKit */ = {
+			isa = PBXGroup;
+			children = (
+				257A68B62BFCFEAE0056916E /* Authorization.swift */,
+			);
+			path = MusicKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,6 +149,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				257A68AA2BFCFD080056916E /* ContentView.swift in Sources */,
+				257A68B72BFCFEAE0056916E /* Authorization.swift in Sources */,
 				257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
