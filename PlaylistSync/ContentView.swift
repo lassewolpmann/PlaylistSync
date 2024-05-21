@@ -6,21 +6,30 @@
 //
 
 import SwiftUI
+import MusicKit
 
 struct ContentView: View {
+    @State var tracks: MusicItemCollection<Track> = []
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
             Button {
                 Task {
-                    let request = await authorize();
-                    print(request);
+                    if (isAuthorized()) {
+                        tracks = await getAllPlaylists()
+                    } else {
+                        let _ = await authorize();
+                    }
                 }
             } label: {
-                Text("Authorize MusicKit")
+                Text("Get all Playlists")
+            }
+            
+            Text("Tracks")
+            List {
+                ForEach(tracks) { track in
+                    Text("\(track.title) by \(track.artistName)")
+                }
             }
         }
         .padding()
