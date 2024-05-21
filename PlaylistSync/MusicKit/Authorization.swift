@@ -16,7 +16,7 @@ func isAuthorized() -> Bool {
     return MusicAuthorization.currentStatus == .authorized
 }
 
-func getAllPlaylists() async -> Void {
+func getAllPlaylists() async -> MusicItemCollection<Track> {
     do {
         let libraryPlaylistsURL = URL(string: "https://api.music.apple.com/v1/me/library/playlists")!
         let libraryPlaylistsRequest = MusicDataRequest(urlRequest: URLRequest(url: libraryPlaylistsURL))
@@ -28,9 +28,12 @@ func getAllPlaylists() async -> Void {
         if let libraryPlaylist = libraryPlaylists.first {
             let detailedLibraryPlaylist = try await libraryPlaylist.with([.tracks])
             let tracks = detailedLibraryPlaylist.tracks ?? []
-            print("\(tracks)")
+            
+            return tracks
         }
     } catch {
-        
+        print("Error")
     }
+    
+    return [] as MusicItemCollection<Track>
 }
