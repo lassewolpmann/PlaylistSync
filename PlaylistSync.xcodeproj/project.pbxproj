@@ -13,6 +13,10 @@
 		257A68AA2BFCFD080056916E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A92BFCFD080056916E /* ContentView.swift */; };
 		257A68AC2BFCFD080056916E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AB2BFCFD080056916E /* Assets.xcassets */; };
 		257A68AF2BFCFD080056916E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AE2BFCFD080056916E /* Preview Assets.xcassets */; };
+		2595CE762BFDFC3900938A15 /* SpotifyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2595CE752BFDFC3900938A15 /* SpotifyView.swift */; };
+		2595CE782BFDFC6400938A15 /* MusicKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2595CE772BFDFC6400938A15 /* MusicKitView.swift */; };
+		2595CE7C2BFDFE1A00938A15 /* SpotifyAuthButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2595CE7B2BFDFE1A00938A15 /* SpotifyAuthButton.swift */; };
+		2595CE7F2BFE004600938A15 /* SpotifyResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +28,10 @@
 		257A68A92BFCFD080056916E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		257A68AB2BFCFD080056916E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		257A68AE2BFCFD080056916E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2595CE752BFDFC3900938A15 /* SpotifyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyView.swift; sourceTree = "<group>"; };
+		2595CE772BFDFC6400938A15 /* MusicKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitView.swift; sourceTree = "<group>"; };
+		2595CE7B2BFDFE1A00938A15 /* SpotifyAuthButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyAuthButton.swift; sourceTree = "<group>"; };
+		2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyResponses.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +50,7 @@
 			children = (
 				25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */,
 				25520F4D2BFDBA6200BAFC46 /* Spotify.swift */,
+				2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */,
 			);
 			path = APIs;
 			sourceTree = "<group>";
@@ -66,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				25520F4A2BFDBA5300BAFC46 /* APIs */,
+				2595CE742BFDFC2700938A15 /* Views */,
 				25520F472BFDB8B500BAFC46 /* Info.plist */,
 				257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */,
 				257A68A92BFCFD080056916E /* ContentView.swift */,
@@ -81,6 +91,32 @@
 				257A68AE2BFCFD080056916E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2595CE742BFDFC2700938A15 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2595CE7A2BFDFE0800938A15 /* MusicKit */,
+				2595CE792BFDFE0200938A15 /* Spotify */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2595CE792BFDFE0200938A15 /* Spotify */ = {
+			isa = PBXGroup;
+			children = (
+				2595CE752BFDFC3900938A15 /* SpotifyView.swift */,
+				2595CE7B2BFDFE1A00938A15 /* SpotifyAuthButton.swift */,
+			);
+			path = Spotify;
+			sourceTree = "<group>";
+		};
+		2595CE7A2BFDFE0800938A15 /* MusicKit */ = {
+			isa = PBXGroup;
+			children = (
+				2595CE772BFDFC6400938A15 /* MusicKitView.swift */,
+			);
+			path = MusicKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,8 +194,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				257A68AA2BFCFD080056916E /* ContentView.swift in Sources */,
+				2595CE7F2BFE004600938A15 /* SpotifyResponses.swift in Sources */,
 				25520F4E2BFDBA6200BAFC46 /* Spotify.swift in Sources */,
+				2595CE762BFDFC3900938A15 /* SpotifyView.swift in Sources */,
+				2595CE782BFDFC6400938A15 /* MusicKitView.swift in Sources */,
 				257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */,
+				2595CE7C2BFDFE1A00938A15 /* SpotifyAuthButton.swift in Sources */,
 				25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
