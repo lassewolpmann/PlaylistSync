@@ -7,20 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */; };
+		25520F4E2BFDBA6200BAFC46 /* Spotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25520F4D2BFDBA6200BAFC46 /* Spotify.swift */; };
 		257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */; };
 		257A68AA2BFCFD080056916E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A92BFCFD080056916E /* ContentView.swift */; };
 		257A68AC2BFCFD080056916E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AB2BFCFD080056916E /* Assets.xcassets */; };
 		257A68AF2BFCFD080056916E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AE2BFCFD080056916E /* Preview Assets.xcassets */; };
-		257A68B72BFCFEAE0056916E /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68B62BFCFEAE0056916E /* Authorization.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		25520F472BFDB8B500BAFC46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKit.swift; sourceTree = "<group>"; };
+		25520F4D2BFDBA6200BAFC46 /* Spotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; };
 		257A68A42BFCFD080056916E /* PlaylistSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlaylistSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSyncApp.swift; sourceTree = "<group>"; };
 		257A68A92BFCFD080056916E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		257A68AB2BFCFD080056916E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		257A68AE2BFCFD080056916E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		257A68B62BFCFEAE0056916E /* Authorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,6 +37,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		25520F4A2BFDBA5300BAFC46 /* APIs */ = {
+			isa = PBXGroup;
+			children = (
+				25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */,
+				25520F4D2BFDBA6200BAFC46 /* Spotify.swift */,
+			);
+			path = APIs;
+			sourceTree = "<group>";
+		};
 		257A689B2BFCFD080056916E = {
 			isa = PBXGroup;
 			children = (
@@ -53,7 +65,8 @@
 		257A68A62BFCFD080056916E /* PlaylistSync */ = {
 			isa = PBXGroup;
 			children = (
-				257A68B52BFCFEA00056916E /* MusicKit */,
+				25520F4A2BFDBA5300BAFC46 /* APIs */,
+				25520F472BFDB8B500BAFC46 /* Info.plist */,
 				257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */,
 				257A68A92BFCFD080056916E /* ContentView.swift */,
 				257A68AB2BFCFD080056916E /* Assets.xcassets */,
@@ -68,14 +81,6 @@
 				257A68AE2BFCFD080056916E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		257A68B52BFCFEA00056916E /* MusicKit */ = {
-			isa = PBXGroup;
-			children = (
-				257A68B62BFCFEAE0056916E /* Authorization.swift */,
-			);
-			path = MusicKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -94,6 +99,8 @@
 			dependencies = (
 			);
 			name = PlaylistSync;
+			packageProductDependencies = (
+			);
 			productName = PlaylistSync;
 			productReference = 257A68A42BFCFD080056916E /* PlaylistSync.app */;
 			productType = "com.apple.product-type.application";
@@ -122,6 +129,8 @@
 				Base,
 			);
 			mainGroup = 257A689B2BFCFD080056916E;
+			packageReferences = (
+			);
 			productRefGroup = 257A68A52BFCFD080056916E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -149,8 +158,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				257A68AA2BFCFD080056916E /* ContentView.swift in Sources */,
-				257A68B72BFCFEAE0056916E /* Authorization.swift in Sources */,
+				25520F4E2BFDBA6200BAFC46 /* Spotify.swift in Sources */,
 				257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */,
+				25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +224,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -270,6 +281,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -287,6 +299,7 @@
 				DEVELOPMENT_TEAM = UU6Y3A827V;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlaylistSync/Info.plist;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Used to sync Playlists across Apple Music and other Apps";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -317,6 +330,7 @@
 				DEVELOPMENT_TEAM = UU6Y3A827V;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PlaylistSync/Info.plist;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Used to sync Playlists across Apple Music and other Apps";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
