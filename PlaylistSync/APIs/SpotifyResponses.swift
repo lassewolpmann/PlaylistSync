@@ -59,3 +59,59 @@ struct UserData: Decodable {
     var type: String
     var uri: String
 }
+
+struct UserPlaylists: Decodable {
+    struct Playlist: Decodable {
+        struct ExternalURLs: Decodable {
+            var spotify: String
+        }
+        
+        struct Image: Decodable {
+            var url: String
+            var height: Int?
+            var width: Int?
+        }
+        
+        struct Owner: Decodable {
+            struct Followers: Decodable {
+                var href: String?
+                var total: Int
+            }
+            
+            var external_urls: ExternalURLs
+            var followers: Followers?
+            var href: String
+            var id: String
+            var type: String
+            var uri: String
+            var display_name: String?
+        }
+        
+        struct Tracks: Decodable {
+            var href: String
+            var total: Int
+        }
+        
+        var collaborative: Bool
+        var description: String
+        var external_urls: ExternalURLs
+        var href: String
+        var id: String
+        var images: [Image]
+        var name: String
+        var owner: Owner
+        var `public`: Bool
+        var snapshot_id: String
+        var tracks: Tracks
+        var type: String
+        var uri: String
+    }
+    
+    var href: String
+    var limit: Int
+    var next: String?
+    var offset: Int
+    var previous: String?
+    var total: Int
+    var items: [Playlist]
+}

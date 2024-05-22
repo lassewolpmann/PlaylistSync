@@ -9,6 +9,8 @@ import Foundation
 import CryptoKit
 import AuthenticationServices
 
+// TODO: Refreshing token
+
 enum SpotifyError: Error {
     case digestError(String)
     case challengeError(String)
@@ -20,7 +22,7 @@ enum SpotifyError: Error {
 }
 
 @Observable
-class SpotifyController {
+final class SpotifyController {
     let clientID = "38171166fd9845f1846a9fa3bea2e925"
     let redirectURI = "playlistsync://com.lassewolpmann.PlaylistSync"
     
@@ -32,11 +34,8 @@ class SpotifyController {
     var authData: AuthData? = nil
     
     init() {
-        let verifier = self.generateRandomString(length: 64)
-        let challenge = self.generateCodeChallenge(verifier: verifier)
-        
-        codeVerifier = verifier
-        codeChallenge = challenge
+        codeVerifier = self.generateRandomString(length: 64)
+        codeChallenge = self.generateCodeChallenge()
         state = self.generateRandomString(length: 64)
     }
     
@@ -45,9 +44,9 @@ class SpotifyController {
         return String((0..<length).map{ _ in letters.randomElement()! })
     }
     
-    private func generateCodeChallenge(verifier: String?) -> String {
+    private func generateCodeChallenge() -> String {
         do {
-            guard let verifierData = verifier!.data(using: .utf8) else { throw SpotifyError.digestError("error") };
+            guard let verifierData = self.codeVerifier!.data(using: .utf8) else { throw SpotifyError.digestError("error") };
             let hashedVerifier = SHA256.hash(data: verifierData)
             let base64EncodedVerifier = Data(hashedVerifier).base64EncodedString()
                 .replacingOccurrences(of: "=", with: "")
@@ -144,6 +143,33 @@ class SpotifyController {
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)
             throw SpotifyError.dataError("Could not get User Data")
+        }
+    }
+    
+    func getUserPlaylists() async throws -> UserPlaylists {
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("Not authorized") }
+        
+        var components = URLComponents(string: "https://api.spotify.com/v1/me/playlists")
+        components?.queryItems = [
+            URLQueryItem(name: "limit", value: "50"),
+            URLQueryItem(name: "offset", value: "0")
+        ]
+        
+        guard let url = components?.url else { throw SpotifyError.urlError("Could not get User Playlists URL") }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as! HTTPURLResponse).statusCode
+        
+        if (statusCode == 200) {
+            let userPlaylists = try JSONDecoder().decode(UserPlaylists.self, from: data)
+            return userPlaylists
+        } else {
+            let _ = try JSONDecoder().decode(GenericError.self, from: data)
+            throw SpotifyError.dataError("Could not get User Playlists")
         }
     }
 }

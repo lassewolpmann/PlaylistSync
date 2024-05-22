@@ -27,4 +27,5 @@ struct SpotifyAuthButton: View {
 
 #Preview {
     SpotifyAuthButton()
+        .environment(SpotifyController())
 }
