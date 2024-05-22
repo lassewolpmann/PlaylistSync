@@ -9,30 +9,25 @@ import SwiftUI
 import MusicKit
 
 struct MusicKitView: View {
-    @State var tracks: MusicItemCollection<Track> = []
+    @State var playlists: MusicItemCollection<Playlist> = []
     let musicKit = MusicKitController()
     
     var body: some View {
-        VStack {
-            Button {
-                Task {
-                    if (musicKit.isAuthorized()) {
-                        tracks = await musicKit.getAllPlaylists()
-                    } else {
-                        let _ = await musicKit.authorize();
-                    }
+        List {
+            if (playlists.isEmpty) {
+                Text("Loading...")
+            } else {
+                ForEach(playlists) { playlist in
+                    Text(playlist.name)
                 }
-            } label: {
-                Text("Get all Playlists")
             }
-            
-            
-            
-            Text("Tracks")
-            List {
-                ForEach(tracks) { track in
-                    Text("\(track.title) by \(track.artistName)")
+        }.task {
+            if (musicKit.isAuthorized()) {
+                if (playlists.isEmpty) {
+                    playlists = await musicKit.getAllPlaylists()
                 }
+            } else {
+                let _ = await musicKit.authorize();
             }
         }
     }
