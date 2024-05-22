@@ -14,21 +14,12 @@ enum SpotifyError: Error {
     case challengeError(String)
     case verifierError(String)
     case stateError(String)
+    case authError(String)
+    case dataError(String)
+    case urlError(String)
 }
 
-struct AuthData: Decodable {
-    var access_token: String
-    var token_type: String
-    var scope: String
-    var expires_in: Int
-    var refresh_token: String
-}
-
-struct AuthError: Decodable {
-    var error: String
-    var error_description: String
-}
-
+@Observable
 class SpotifyController {
     let clientID = "38171166fd9845f1846a9fa3bea2e925"
     let redirectURI = "playlistsync://com.lassewolpmann.PlaylistSync"
@@ -37,6 +28,7 @@ class SpotifyController {
     var codeChallenge: String? = nil
     var state: String? = nil
     
+    var authSuccess: Bool = false
     var authData: AuthData? = nil
     
     init() {
@@ -76,7 +68,7 @@ class SpotifyController {
         components?.queryItems = [
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "client_id", value: self.clientID),
-            URLQueryItem(name: "scope", value: "playlist-read-private"),
+            URLQueryItem(name: "scope", value: "playlist-read-private user-read-private user-read-email"),
             URLQueryItem(name: "code_challenge_method", value: "S256"),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "state", value: self.state),
@@ -129,8 +121,29 @@ class SpotifyController {
         
         if (statusCode == 200) {
             self.authData = try JSONDecoder().decode(AuthData.self, from: data)
+            self.authSuccess = true
         } else {
             let errorData = try JSONDecoder().decode(AuthError.self, from: data)
+            print(errorData)
+        }
+    }
+    
+    func getUserData() async throws -> UserData {
+        guard let url = URL(string: "https://api.spotify.com/v1/me") else { throw SpotifyError.urlError("Could not get User Data URL") }
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("Not authorized") }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as! HTTPURLResponse).statusCode
+        
+        if (statusCode == 200) {
+            let userData = try JSONDecoder().decode(UserData.self, from: data)
+            return userData
+        } else {
+            let _ = try JSONDecoder().decode(GenericError.self, from: data)
+            throw SpotifyError.dataError("Could not get User Data")
         }
     }
 }

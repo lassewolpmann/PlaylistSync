@@ -6,49 +6,23 @@
 //
 
 import SwiftUI
-import MusicKit
-import AuthenticationServices
 
 struct ContentView: View {
-    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
-    @State var tracks: MusicItemCollection<Track> = []
+
     
-    let musicKit = MusicKitController()
-    let spotify = SpotifyController()
     
     var body: some View {
-        VStack {
-            Button {
-                Task {
-                    if (musicKit.isAuthorized()) {
-                        tracks = await musicKit.getAllPlaylists()
-                    } else {
-                        let _ = await musicKit.authorize();
-                    }
+        TabView {
+            SpotifyView()
+                .tabItem {
+                    Label("Spotify", systemImage: "music.note")
                 }
-            } label: {
-                Text("Get all Playlists")
-            }
             
-            Button {
-                Task {
-                    let url = try spotify.generateRequestURL()
-                    let urlWithCode = try await webAuthenticationSession.authenticate(using: url!, callbackURLScheme: "playlistsync")
-                    
-                    try await spotify.exchangeCodeForToken(urlWithCode: urlWithCode)
+            MusicKitView()
+                .tabItem {
+                    Label("Apple Music", systemImage: "music.note")
                 }
-            } label: {
-                Text("Authorize with Spotify")
-            }
-            
-            Text("Tracks")
-            List {
-                ForEach(tracks) { track in
-                    Text("\(track.title) by \(track.artistName)")
-                }
-            }
         }
-        .padding()
     }
 }
 
