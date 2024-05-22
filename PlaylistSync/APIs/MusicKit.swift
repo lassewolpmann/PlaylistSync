@@ -17,7 +17,7 @@ class MusicKitController {
         return MusicAuthorization.currentStatus == .authorized
     }
     
-    func getAllPlaylists() async -> MusicItemCollection<Track> {
+    func getAllPlaylists() async -> MusicItemCollection<Playlist> {
         do {
             let libraryPlaylistsURL = URL(string: "https://api.music.apple.com/v1/me/library/playlists")!
             let libraryPlaylistsRequest = MusicDataRequest(urlRequest: URLRequest(url: libraryPlaylistsURL))
@@ -26,16 +26,11 @@ class MusicKitController {
             let decoder = JSONDecoder()
             let libraryPlaylists = try decoder.decode(MusicItemCollection<Playlist>.self, from: libraryPlaylistsResponse.data)
 
-            if let libraryPlaylist = libraryPlaylists.first {
-                let detailedLibraryPlaylist = try await libraryPlaylist.with([.tracks])
-                let tracks = detailedLibraryPlaylist.tracks ?? []
-                
-                return tracks
-            }
+            return libraryPlaylists
         } catch {
             print("Error")
         }
         
-        return [] as MusicItemCollection<Track>
+        return [] as MusicItemCollection<Playlist>
     }
 }

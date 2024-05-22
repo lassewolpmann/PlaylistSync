@@ -21,10 +21,12 @@ struct SpotifyPlaylists: View {
                 Text("Loading...")
             }
         }.task {
-            do {
-                playlists = try await spotify.getUserPlaylists()
-            } catch {
-                print(error)
+            if (playlists == nil) {
+                do {
+                    playlists = try await spotify.getUserPlaylists()
+                } catch {
+                    print(error)
+                }
             }
         }
     }
