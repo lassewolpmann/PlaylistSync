@@ -6,16 +6,18 @@
 	<array>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string></string>
+			<string>com.lassewolpmann.PlaylistSync</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
 			<string>com.lassewolpmann.PlaylistSync</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>playlistsync://</string>
+				<string>playlistsync</string>
 			</array>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
