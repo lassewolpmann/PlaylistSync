@@ -8,15 +8,15 @@
 import Foundation
 import MusicKit
 
+@Observable
 class MusicKitController {
-    func authorize() async -> MusicAuthorization.Status {
-        return await MusicAuthorization.request()
+    var authSuccess: Bool = false
+    
+    func authorize() async -> Void {
+        let auth = await MusicAuthorization.request()
+        authSuccess = auth == .authorized
     }
 
-    func isAuthorized() -> Bool {
-        return MusicAuthorization.currentStatus == .authorized
-    }
-    
     func getAllPlaylists() async -> MusicItemCollection<Playlist> {
         do {
             let libraryPlaylistsURL = URL(string: "https://api.music.apple.com/v1/me/library/playlists")!

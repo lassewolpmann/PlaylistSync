@@ -10,29 +10,36 @@ import MusicKit
 
 struct MusicKitView: View {
     @State var playlists: MusicItemCollection<Playlist> = []
-    let musicKit = MusicKitController()
+    @Environment(MusicKitController.self) private var musicKit
     
     var body: some View {
-        List {
+        if (musicKit.authSuccess) {
             if (playlists.isEmpty) {
                 Text("Loading...")
             } else {
-                ForEach(playlists) { playlist in
-                    Text(playlist.name)
+                List {
+                    ForEach(playlists) { playlist in
+                        Text(playlist.name)
+                    }
+                }
+                .task {
+                    if (musicKit.authSuccess) {
+                        if (playlists.isEmpty) {
+                            playlists = await musicKit.getAllPlaylists()
+                        }
+                    } else {
+                        print("No auth.")
+                        // let _ = await musicKit.authorize();
+                    }
                 }
             }
-        }.task {
-            if (musicKit.isAuthorized()) {
-                if (playlists.isEmpty) {
-                    playlists = await musicKit.getAllPlaylists()
-                }
-            } else {
-                let _ = await musicKit.authorize();
-            }
+        } else {
+            Text("Authorize MusicKit in Settings.")
         }
     }
 }
 
 #Preview {
     MusicKitView()
+        .environment(MusicKitController())
 }

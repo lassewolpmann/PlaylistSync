@@ -9,21 +9,19 @@ import SwiftUI
 import AuthenticationServices
 
 struct SpotifyView: View {
-    @State private var spotify = SpotifyController()
+    @Environment(SpotifyController.self) private var spotify
     
     var body: some View {
-        VStack {
-            if (spotify.authSuccess) {
-                SpotifyPlaylists()
-                    .environment(spotify)
-            } else {
-                SpotifyAuthButton()
-                    .environment(spotify)
-            }
+        if (spotify.authSuccess) {
+            SpotifyPlaylists()
+                .environment(spotify)
+        } else {
+            Text("Authorize Spotify in Settings.")
         }
     }
 }
 
 #Preview {
     SpotifyView()
+        .environment(SpotifyController())
 }
