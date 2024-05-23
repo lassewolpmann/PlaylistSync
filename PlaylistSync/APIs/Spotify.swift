@@ -33,6 +33,8 @@ final class SpotifyController {
     var authSuccess: Bool = false
     var authData: AuthData? = nil
     
+    var tokenRefreshDate: Date = Date()
+    
     init() {
         codeVerifier = self.generateRandomString(length: 64)
         codeChallenge = self.generateCodeChallenge()
@@ -121,6 +123,7 @@ final class SpotifyController {
         if (statusCode == 200) {
             self.authData = try JSONDecoder().decode(AuthData.self, from: data)
             self.authSuccess = true
+            self.tokenRefreshDate = Date().addingTimeInterval(TimeInterval(self.authData?.expires_in ?? 0))
         } else {
             let errorData = try JSONDecoder().decode(AuthError.self, from: data)
             print(errorData)
@@ -129,7 +132,7 @@ final class SpotifyController {
     
     func getUserData() async throws -> UserData {
         guard let url = URL(string: "https://api.spotify.com/v1/me") else { throw SpotifyError.urlError("Could not get User Data URL") }
-        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("Not authorized") }
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
@@ -147,7 +150,7 @@ final class SpotifyController {
     }
     
     func getUserPlaylists() async throws -> UserPlaylists {
-        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("Not authorized") }
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
         
         var components = URLComponents(string: "https://api.spotify.com/v1/me/playlists")
         components?.queryItems = [
@@ -171,5 +174,30 @@ final class SpotifyController {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)
             throw SpotifyError.dataError("Could not get User Playlists")
         }
+    }
+    
+    func getPlaylist(playlistID: String) async throws -> SpotifyPlaylist {
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
+        
+        guard let url = URL(string: "https://api.spotify.com/v1/playlists/\(playlistID)") else { throw SpotifyError.urlError("Could not get User Playlists URL") }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as! HTTPURLResponse).statusCode
+                
+        if (statusCode == 200) {
+            let playlist = try JSONDecoder().decode(SpotifyPlaylist.self, from: data)
+            return playlist
+        } else {
+            let _ = try JSONDecoder().decode(GenericError.self, from: data)
+            throw SpotifyError.dataError("Could not get Playlist")
+        }
+    }
+    
+    func revokeToken() -> Void {
+        self.authData = nil
+        self.authSuccess = false
     }
 }

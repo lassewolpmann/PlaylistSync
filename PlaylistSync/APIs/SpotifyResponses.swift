@@ -25,25 +25,37 @@ struct GenericError: Decodable {
     var message: String
 }
 
+struct Followers: Decodable {
+    var href: String?
+    var total: Int
+}
+
+struct ExternalURLs: Decodable {
+    var spotify: String
+}
+
+struct Image: Decodable {
+    var url: String
+    var height: Int?
+    var width: Int?
+}
+
+struct Owner: Decodable {
+    var external_urls: ExternalURLs
+    var followers: Followers?
+    var href: String
+    var id: String
+    var type: String
+    var uri: String
+    var display_name: String?
+}
+
 struct UserData: Decodable {
+    // https://developer.spotify.com/documentation/web-api/reference/get-current-users-profile
+    
     struct ExplicitContent: Decodable {
         var filter_enabled: Bool
         var filter_locked: Bool
-    }
-    
-    struct ExternalURLs: Decodable {
-        var spotify: String
-    }
-    
-    struct Followers: Decodable {
-        var href: String?
-        var total: Int
-    }
-    
-    struct Image: Decodable {
-        var url: String
-        var height: Int
-        var width: Int
     }
     
     var country: String
@@ -61,32 +73,9 @@ struct UserData: Decodable {
 }
 
 struct UserPlaylists: Decodable {
+    // https://developer.spotify.com/documentation/web-api/reference/get-list-users-playlists
+    
     struct Playlist: Decodable {
-        struct ExternalURLs: Decodable {
-            var spotify: String
-        }
-        
-        struct Image: Decodable {
-            var url: String
-            var height: Int?
-            var width: Int?
-        }
-        
-        struct Owner: Decodable {
-            struct Followers: Decodable {
-                var href: String?
-                var total: Int
-            }
-            
-            var external_urls: ExternalURLs
-            var followers: Followers?
-            var href: String
-            var id: String
-            var type: String
-            var uri: String
-            var display_name: String?
-        }
-        
         struct Tracks: Decodable {
             var href: String
             var total: Int
@@ -114,4 +103,75 @@ struct UserPlaylists: Decodable {
     var previous: String?
     var total: Int
     var items: [Playlist]
+}
+
+struct SpotifyPlaylist: Decodable {
+    // https://developer.spotify.com/documentation/web-api/reference/get-playlist
+    
+    struct Tracks: Decodable {
+        struct Track: Decodable {
+            struct TrackObject: Decodable {
+                // Values if track is a TrackObject
+                struct Album: Decodable {
+                    var album_type: String
+                    var total_tracks: Int
+                    var images: [Image]
+                    var name: String
+                    var release_date: String
+                }
+                
+                struct Artist: Decodable {
+                    var name: String
+                }
+                
+                struct ExternalIDs: Decodable {
+                    var isrc: String?
+                    var ean: String?
+                    var upc: String?
+                }
+                
+                
+                var album: Album
+                var artists: [Artist]
+                var disc_number: Int
+                var duration_ms: Int
+                var explicit: Bool
+                var external_ids: ExternalIDs
+                var id: String
+                var name: String
+                var track_number: Int
+                
+                // Values if track is an EpisodeObject
+                // Since we don't care about episodes, I'll just let the decoding fail on this one
+            }
+            
+            var added_at: String?
+            var added_by: Owner?
+            var is_local: Bool
+            var track: TrackObject
+        }
+        
+        var href: String
+        var limit: Int
+        var next: String?
+        var offset: Int
+        var previous: String?
+        var total: Int
+        var items: [Track]
+    }
+    
+    var collaborative: Bool
+    var description: String
+    var external_urls: ExternalURLs
+    var followers: Followers
+    var href: String
+    var id: String
+    var images: [Image]
+    var name: String
+    var owner: Owner
+    var `public`: Bool
+    var snapshot_id: String
+    var tracks: Tracks
+    var type: String
+    var uri: String
 }

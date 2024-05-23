@@ -12,15 +12,28 @@ struct SpotifyPlaylists: View {
     @State private var playlists: UserPlaylists?
 
     var body: some View {
-        List {
-            if (playlists != nil) {
-                ForEach(playlists?.items ?? [], id: \.id) { playlist in
-                    Text(playlist.name)
+        NavigationStack {
+            List {
+                if (playlists != nil) {
+                    ForEach(playlists?.items ?? [], id: \.id) { playlist in
+                        NavigationLink {
+                            SpotifyPlaylistView(playlistID: playlist.id)
+                                .environment(spotify)
+                        } label: {
+                            SpotifyLabel(
+                                name: playlist.name,
+                                author: playlist.owner.display_name ?? "",
+                                imageURL: playlist.images.first?.url ?? ""
+                            )
+                        }
+                    }
+                } else {
+                    Text("Loading...")
                 }
-            } else {
-                Text("Loading...")
             }
-        }.task {
+            .navigationTitle("Your Spotify Playlists")
+        }
+        .task {
             if (playlists == nil) {
                 do {
                     playlists = try await spotify.getUserPlaylists()
