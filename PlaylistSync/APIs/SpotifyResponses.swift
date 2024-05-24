@@ -34,7 +34,7 @@ struct ExternalURLs: Decodable {
     var spotify: String
 }
 
-struct Image: Decodable {
+struct ExternalImage: Decodable {
     var url: String
     var height: Int?
     var width: Int?
@@ -66,7 +66,7 @@ struct UserData: Decodable {
     var followers: Followers
     var href: String
     var id: String
-    var images: [Image]
+    var images: [ExternalImage]
     var product: String
     var type: String
     var uri: String
@@ -86,7 +86,7 @@ struct UserPlaylists: Decodable {
         var external_urls: ExternalURLs
         var href: String
         var id: String
-        var images: [Image]
+        var images: [ExternalImage]
         var name: String
         var owner: Owner
         var `public`: Bool
@@ -115,7 +115,7 @@ struct SpotifyPlaylist: Decodable {
                 struct Album: Decodable {
                     var album_type: String
                     var total_tracks: Int
-                    var images: [Image]
+                    var images: [ExternalImage]
                     var name: String
                     var release_date: String
                 }
@@ -166,7 +166,7 @@ struct SpotifyPlaylist: Decodable {
     var followers: Followers
     var href: String
     var id: String
-    var images: [Image]
+    var images: [ExternalImage]
     var name: String
     var owner: Owner
     var `public`: Bool

@@ -16,12 +16,15 @@ struct MusicKitPlaylistTrack: View {
     
     var body: some View {
         ItemLabel(
-            name: song?.title ?? "",
-            author: song?.artistName ?? "",
+            name: track?.title ?? "",
+            author: track?.artistName ?? "",
             imageURL: song?.artwork?.url(width: 320, height: 320)?.absoluteString ?? ""
         )
         .task {
             song = await musicKit.getSong(track: track)
+            guard let _ = song?.artwork?.debugDescription else {
+                return
+            }
         }
     }
 }

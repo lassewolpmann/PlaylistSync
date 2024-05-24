@@ -21,11 +21,24 @@ struct SettingsView: View {
             List {
                 Section {
                     Toggle(isOn: $spotifyAuth) {
-                        Text("Spotify")
+                        Label {
+                            Text("Spotify")
+                        } icon: {
+                            Image("SpotifyIcon")
+                                .resizable()
+                                .scaledToFit()
+                        }
                     }
                     
                     Toggle(isOn: $musicKitAuth) {
-                        Text("MusicKit")
+                        Label {
+                            Text("Apple Music")
+                        } icon: {
+                            Image("AppleMusicIcon")
+                                .resizable()
+                                .scaledToFit()
+                        }
+                        
                     }
                 } header: {
                     Text("Authorization")

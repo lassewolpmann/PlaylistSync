@@ -47,28 +47,39 @@ class MusicKitController {
     }
     
     func getSong(track: MusicItemCollection<Track>.Element?) async -> Song? {
-        // print(track?.debugDescription)
+        guard let trackTitle = track?.title else {
+            return nil
+        }
         
-        if let trackTitle = track?.title {
-            var request = MusicCatalogSearchRequest(term: trackTitle, types: [Song.self])
-            request.limit = 10
+        guard let trackArtist = track?.artistName.lowercased() else {
+            return nil
+        }
+        
+        guard let trackDuration = track?.duration else {
+            return nil
+        }
+        
+        var request = MusicCatalogSearchRequest(term: "\(trackTitle) \(trackArtist)", types: [Song.self])
+        request.limit = 25
+        
+        do {
+            let response = try await request.response()
+            print(response.topResults.debugDescription)
+            let filtered = response.songs.filter { song in
+                return song.duration == trackDuration && song.artistName.lowercased() == trackArtist
+            }
             
-            do {
-                let response = try await request.response()
-                let filtered = response.songs.filter { song in
-                    return song.duration == track?.duration
-                }
-                
-                if let song = filtered.first {
-                    return song
-                }
-            } catch {
-                print(error)
+            guard let song = filtered.first else {
+                print("Could not find \(trackTitle), by \(trackArtist)", response.debugDescription)
                 
                 return nil
             }
+            
+            return song
+        } catch {
+            print(error)
+            
+            return nil
         }
-        
-        return nil
     }
 }
