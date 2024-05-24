@@ -40,7 +40,7 @@ struct SettingsView: View {
                             let url = try spotify.generateRequestURL()
                             let urlWithCode = try await webAuthenticationSession.authenticate(using: url!, callbackURLScheme: "playlistsync")
                             
-                            try await spotify.exchangeCodeForToken(urlWithCode: urlWithCode)
+                            try await spotify.exchangeCodeForToken(urlWithCode: urlWithCode)                            
                         }
                     } else {
                         spotify.revokeToken()
@@ -52,6 +52,7 @@ struct SettingsView: View {
                             let _ = await musicKit.authorize();
                         }
                     } else {
+                        musicKit.authSuccess = false
                         print("Revoke MusicKit auth")
                     }
                 }

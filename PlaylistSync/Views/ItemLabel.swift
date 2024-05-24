@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct SpotifyLabel: View {
+struct ItemLabel: View {
     let name: String
     let author: String
     let imageURL: String
     
-    struct SpotifyLabelStyle: LabelStyle {
+    struct ItemLabelStyle: LabelStyle {
         func makeBody(configuration: Configuration) -> some View {
             HStack(alignment: .center) {
                 configuration.icon
@@ -32,10 +32,10 @@ struct SpotifyLabel: View {
         } icon: {
             LabelImage(url: imageURL)
         }
-        .labelStyle(SpotifyLabelStyle())
+        .labelStyle(ItemLabelStyle())
     }
 }
 
 #Preview {
-    SpotifyLabel(name: "", author: "", imageURL: "")
+    ItemLabel(name: "", author: "", imageURL: "")
 }

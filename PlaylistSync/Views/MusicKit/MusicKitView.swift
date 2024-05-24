@@ -9,32 +9,20 @@ import SwiftUI
 import MusicKit
 
 struct MusicKitView: View {
-    @State var playlists: MusicItemCollection<Playlist> = []
     @Environment(MusicKitController.self) private var musicKit
-    
+    @State var playlists: MusicItemCollection<Playlist>?
+
     var body: some View {
-        if (musicKit.authSuccess) {
-            if (playlists.isEmpty) {
-                Text("Loading...")
-            } else {
-                List {
-                    ForEach(playlists) { playlist in
-                        Text(playlist.name)
-                    }
-                }
-                .task {
-                    if (musicKit.authSuccess) {
-                        if (playlists.isEmpty) {
-                            playlists = await musicKit.getAllPlaylists()
-                        }
-                    } else {
-                        print("No auth.")
-                        // let _ = await musicKit.authorize();
-                    }
+        NavigationStack {
+            Group {
+                if (musicKit.authSuccess) {
+                    MusicKitPlaylists()
+                        .environment(musicKit)
+                } else {
+                    Text("Authorize MusicKit in Settings.")
                 }
             }
-        } else {
-            Text("Authorize MusicKit in Settings.")
+            .navigationTitle("Apple Music")
         }
     }
 }

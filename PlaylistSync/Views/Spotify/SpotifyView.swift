@@ -12,11 +12,16 @@ struct SpotifyView: View {
     @Environment(SpotifyController.self) private var spotify
     
     var body: some View {
-        if (spotify.authSuccess) {
-            SpotifyPlaylists()
-                .environment(spotify)
-        } else {
-            Text("Authorize Spotify in Settings.")
+        NavigationStack {
+            Group {
+                if (spotify.authSuccess) {
+                    SpotifyPlaylists()
+                        .environment(spotify)
+                } else {
+                    Text("Authorize Spotify in Settings.")
+                }
+            }
+            .navigationTitle("Spotify")
         }
     }
 }
