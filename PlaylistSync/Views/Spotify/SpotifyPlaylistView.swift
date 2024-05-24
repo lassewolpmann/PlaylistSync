@@ -17,10 +17,9 @@ struct SpotifyPlaylistView: View {
         List {
             if (playlist != nil) {
                 ForEach(playlist?.tracks.items ?? [], id: \.track.id) { item in
-                    let authorNames = item.track.artists.map { $0.name }
-                    SpotifyLabel(
+                    ItemLabel(
                         name: item.track.name,
-                        author: authorNames.joined(separator: ", "),
+                        author: item.track.artists.first?.name ?? "",
                         imageURL: item.track.album.images.first?.url ?? ""
                     )
                 }

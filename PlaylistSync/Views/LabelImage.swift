@@ -19,7 +19,7 @@ struct LabelImage: View {
             ProgressView().progressViewStyle(.circular)
         }
         .frame(width: 48, height: 48)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 3))
         .shadow(radius: 10)
     }
 }

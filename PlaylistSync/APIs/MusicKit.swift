@@ -17,20 +17,58 @@ class MusicKitController {
         authSuccess = auth == .authorized
     }
 
-    func getAllPlaylists() async -> MusicItemCollection<Playlist> {
+    func getUserPlaylists() async -> MusicItemCollection<Playlist> {
+        let request = MusicLibraryRequest<Playlist>()
+        
         do {
-            let libraryPlaylistsURL = URL(string: "https://api.music.apple.com/v1/me/library/playlists")!
-            let libraryPlaylistsRequest = MusicDataRequest(urlRequest: URLRequest(url: libraryPlaylistsURL))
-            let libraryPlaylistsResponse = try await libraryPlaylistsRequest.response()
-            
-            let decoder = JSONDecoder()
-            let libraryPlaylists = try decoder.decode(MusicItemCollection<Playlist>.self, from: libraryPlaylistsResponse.data)
-
-            return libraryPlaylists
+            let playlists = try await request.response()
+            return playlists.items
         } catch {
-            print("Error")
+            print(error)
+            return [] as MusicItemCollection<Playlist>
+        }
+    }
+    
+    func getPlaylist(playlist: Playlist?) async -> Playlist? {
+        if let playlist {
+            do {
+                let detailedPlaylist = try await playlist.with(.tracks)
+
+                return detailedPlaylist
+                
+            } catch {
+                print(error)
+                
+                return nil
+            }
+        } else {
+            return nil
+        }
+    }
+    
+    func getSong(track: MusicItemCollection<Track>.Element?) async -> Song? {
+        // print(track?.debugDescription)
+        
+        if let trackTitle = track?.title {
+            var request = MusicCatalogSearchRequest(term: trackTitle, types: [Song.self])
+            request.limit = 10
+            
+            do {
+                let response = try await request.response()
+                let filtered = response.songs.filter { song in
+                    return song.duration == track?.duration
+                }
+                
+                if let song = filtered.first {
+                    return song
+                }
+            } catch {
+                print(error)
+                
+                return nil
+            }
         }
         
-        return [] as MusicItemCollection<Playlist>
+        return nil
     }
 }
