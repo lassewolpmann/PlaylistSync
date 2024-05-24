@@ -26,7 +26,7 @@ struct MusicKitPlaylistView: View {
         }
         .navigationTitle(playlist?.name ?? "")
         .task {
-            detailedPlaylist = await musicKit.getPlaylist(playlist: playlist)            
+            detailedPlaylist = await musicKit.getPlaylist(playlist: playlist)
         }
     }
 }
