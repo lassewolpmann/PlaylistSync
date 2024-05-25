@@ -18,11 +18,13 @@ struct ContentView: View {
                     Label("Spotify", systemImage: "music.note")
                 }
                 .environment(spotify)
+                .environment(musicKit)
             
             MusicKitView()
                 .tabItem {
                     Label("Apple Music", systemImage: "music.note")
                 }
+                .environment(spotify)
                 .environment(musicKit)
             
             SettingsView()

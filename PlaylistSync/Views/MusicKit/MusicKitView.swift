@@ -9,7 +9,9 @@ import SwiftUI
 import MusicKit
 
 struct MusicKitView: View {
+    @Environment(SpotifyController.self) private var spotify
     @Environment(MusicKitController.self) private var musicKit
+    
     @State var playlists: MusicItemCollection<Playlist>?
 
     var body: some View {
@@ -29,5 +31,6 @@ struct MusicKitView: View {
 
 #Preview {
     MusicKitView()
+        .environment(SpotifyController())
         .environment(MusicKitController())
 }

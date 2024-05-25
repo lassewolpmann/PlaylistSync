@@ -75,7 +75,15 @@ struct UserData: Decodable {
 struct UserPlaylists: Decodable {
     // https://developer.spotify.com/documentation/web-api/reference/get-list-users-playlists
     
-    struct Playlist: Decodable {
+    struct Playlist: Decodable, Hashable {
+        static func == (lhs: UserPlaylists.Playlist, rhs: UserPlaylists.Playlist) -> Bool {
+            return lhs.id == rhs.id
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
+        
         struct Tracks: Decodable {
             var href: String
             var total: Int
