@@ -64,7 +64,6 @@ class MusicKitController {
         
         do {
             let response = try await request.response()
-            print(response.topResults.debugDescription)
             let filtered = response.songs.filter { song in
                 return song.duration == trackDuration && song.artistName.lowercased() == trackArtist
             }
@@ -81,5 +80,12 @@ class MusicKitController {
             
             return nil
         }
+    }
+    
+    func syncSpotifyToMusicKit(playlists: Set<UserPlaylists.Playlist>) -> Void {
+        print(playlists.debugDescription)
+        // Step 1: Get Spotify Playlists
+        // Step 2: Search Apple Music for Songs with the ISRC Code
+        // Step 3: Create Playlist with same name in Apple Music
     }
 }

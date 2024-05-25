@@ -22,9 +22,6 @@ struct MusicKitPlaylistTrack: View {
         )
         .task {
             song = await musicKit.getSong(track: track)
-            guard let _ = song?.artwork?.debugDescription else {
-                return
-            }
         }
     }
 }
