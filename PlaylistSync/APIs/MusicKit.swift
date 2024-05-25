@@ -82,10 +82,31 @@ class MusicKitController {
         }
     }
     
-    func syncSpotifyToMusicKit(playlists: Set<UserPlaylists.Playlist>) -> Void {
-        print(playlists.debugDescription)
-        // Step 1: Get Spotify Playlists
-        // Step 2: Search Apple Music for Songs with the ISRC Code
-        // Step 3: Create Playlist with same name in Apple Music
+    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> [Song?] {
+        struct MatchedSong {
+            var song: Song
+            var confidence: Int
+        }
+        
+        let request = MusicCatalogResourceRequest<Song>(matching: \.isrc, equalTo: spotifyTrack.external_ids.isrc)
+        var matchedSongs: [MatchedSong] = []
+        
+        do {
+            let tracks = try await request.response()
+            for track in tracks.items {
+                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: track)
+                matchedSongs.append(MatchedSong(song: track, confidence: confidence))
+            }
+            
+            matchedSongs = matchedSongs.sorted(by: { a, b in
+                a.confidence > b.confidence
+            })
+            
+            let songs = matchedSongs.map { $0.song }
+            
+            return songs
+        } catch {
+            return []
+        }
     }
 }

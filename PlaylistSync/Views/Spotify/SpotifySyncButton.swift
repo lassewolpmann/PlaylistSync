@@ -8,16 +8,18 @@
 import SwiftUI
 
 struct SpotifySyncButton: View {
+    @Environment(SpotifyController.self) private var spotify
     @Environment(MusicKitController.self) private var musicKit
     
-    @State var playlists: Set<UserPlaylists.Playlist>
+    @State var showSheet: Bool = false
+    var playlist: SpotifyPlaylist?
     
     var body: some View {
         Button {
-            musicKit.syncSpotifyToMusicKit(playlists: playlists)
+            showSheet.toggle()
         } label: {
             Label {
-                Text("Sync selected Playlists to Apple Music")
+                Text("Sync \(playlist?.name ?? "unknown") to Apple Music")
                     .fontWeight(.bold)
             } icon: {
                 Image("AppleMusicIcon")
@@ -32,10 +34,15 @@ struct SpotifySyncButton: View {
                         RoundedRectangle(cornerRadius: 10)
         )
         .padding(.bottom, 10)
+        .sheet(isPresented: $showSheet, content: {
+            SpotifySyncSheet(playlist: playlist)
+                .environment(musicKit)
+        })
     }
 }
 
 #Preview {
-    SpotifySyncButton(playlists: [])
+    SpotifySyncButton()
+        .environment(SpotifyController())
         .environment(MusicKitController())
 }

@@ -9,12 +9,10 @@ import SwiftUI
 
 struct SpotifyPlaylists: View {
     @Environment(SpotifyController.self) private var spotify
-    
     @State private var playlists: UserPlaylists?
-    @Binding var selection: Set<UserPlaylists.Playlist>
 
     var body: some View {
-        List(playlists?.items ?? [], id: \.self, selection: $selection) { playlist in
+        List(playlists?.items ?? [], id: \.self) { playlist in
             NavigationLink {
                 SpotifyPlaylistView(playlistID: playlist.id)
                     .environment(spotify)
@@ -46,6 +44,6 @@ struct SpotifyPlaylists: View {
 }
 
 #Preview {
-    SpotifyPlaylists(selection: .constant([]))
+    SpotifyPlaylists()
         .environment(SpotifyController())
 }
