@@ -12,15 +12,6 @@ struct ItemLabel: View {
     let author: String
     let imageURL: String
     
-    struct ItemLabelStyle: LabelStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            HStack(alignment: .center) {
-                configuration.icon
-                configuration.title
-            }
-        }
-    }
-    
     var body: some View {
         Label {
             VStack(alignment: .leading) {
@@ -32,7 +23,7 @@ struct ItemLabel: View {
         } icon: {
             LabelImage(url: imageURL)
         }
-        .labelStyle(ItemLabelStyle())
+        .labelStyle(HorizontalAlignedLabel())
     }
 }
 

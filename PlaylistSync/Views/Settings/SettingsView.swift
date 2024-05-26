@@ -40,8 +40,6 @@ struct SettingsView: View {
                         }
                         
                     }
-                } header: {
-                    Text("Authorization")
                 }
                 .onAppear {
                     spotifyAuth = spotify.authSuccess
@@ -74,7 +72,7 @@ struct SettingsView: View {
                     
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Authorization")
         }
     }
 }

@@ -16,23 +16,13 @@ struct SpotifyPlaylistView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            if (playlist != nil) {
-                List {
-                    Section {
-                        if (playlist != nil) {
-                            ForEach(playlist?.tracks.items ?? [], id: \.track.id) { item in
-                                ItemLabel(
-                                    name: item.track.name,
-                                    author: item.track.artists.first?.name ?? "",
-                                    imageURL: item.track.album.images.first?.url ?? ""
-                                )
-                            }
-                        } else {
-                            ProgressView()
-                        }
-                    } header: {
-                        Text("Songs")
-                    }
+            if let playlist {
+                List(playlist.tracks.items, id: \.track.id) { item in
+                    ItemLabel(
+                        name: item.track.name,
+                        author: item.track.artists.first?.name ?? "",
+                        imageURL: item.track.album.images.first?.url ?? ""
+                    )
                 }
                 
                 SpotifySyncButton(playlist: playlist)

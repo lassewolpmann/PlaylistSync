@@ -189,6 +189,9 @@ final class SpotifyController {
                 
         if (statusCode == 200) {
             let playlist = try JSONDecoder().decode(SpotifyPlaylist.self, from: data)
+            
+            // TODO: Fix limit of 100 songs
+            print(playlist.tracks.total, playlist.tracks.limit)
             return playlist
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)

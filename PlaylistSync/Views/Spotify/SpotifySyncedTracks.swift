@@ -13,6 +13,7 @@ struct SpotifySyncedTracks: View {
     let matchedSongs: [Song]
     
     @State private var selectedSong: Song?
+    @Binding var selectedSongs: [Song]
     
     var body: some View {
         Section {
@@ -68,11 +69,25 @@ struct SpotifySyncedTracks: View {
                 }
             }
         }
+        .onChange(of: selectedSong) { oldValue, newValue in
+            if let oldValue {
+                let index = selectedSongs.firstIndex(of: oldValue)
+                if let index {
+                    selectedSongs.remove(at: index)
+                }
+            }
+            
+            if let newValue {
+                selectedSongs.append(newValue)
+            }
+            
+            print(selectedSongs.count)
+        }
     }
 }
 
 #Preview {
     List {
-        SpotifySyncedTracks(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject(), matchedSongs: [])
+        SpotifySyncedTracks(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject(), matchedSongs: [], selectedSongs: .constant([]))
     }
 }

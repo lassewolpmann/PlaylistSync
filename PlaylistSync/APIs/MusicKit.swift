@@ -118,4 +118,25 @@ class MusicKitController {
             return []
         }
     }
+    
+    func createPlaylist(playlistName: String, songs: [Song]) async -> String {
+        let request = MusicLibrarySearchRequest(term: playlistName, types: [Playlist.self])
+        
+        do {
+            let existingPlaylistsWithSameName = try await request.response()
+            if (existingPlaylistsWithSameName.playlists.count > 0) { return "Playlist with same name exists already." }
+        } catch {
+            return "Could not check for existing Playlists in Apple Music Library: \(error.localizedDescription)."
+        }
+        
+        do {
+            let library = MusicLibrary.shared
+
+            try await library.createPlaylist(name: playlistName, authorDisplayName: "PlaylistSync", items: songs)
+            
+            return "Successfully created Playlist in your Library."
+        } catch {
+            return "Could not create Playlist: \(error.localizedDescription)."
+        }
+    }
 }
