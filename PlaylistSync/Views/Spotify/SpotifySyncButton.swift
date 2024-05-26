@@ -37,6 +37,7 @@ struct SpotifySyncButton: View {
         .sheet(isPresented: $showSheet, content: {
             SpotifySyncSheet(playlist: playlist)
                 .environment(musicKit)
+                .presentationBackground(.ultraThinMaterial)
         })
     }
 }

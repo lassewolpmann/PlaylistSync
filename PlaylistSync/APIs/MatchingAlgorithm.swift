@@ -31,5 +31,7 @@ func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject,
     let musicKitReleaseDate = musicKitTrack.releaseDate?.ISO8601Format().components(separatedBy: "T").first
     if (spotifyReleaseDate == musicKitReleaseDate) { confidence += 7 }
     
+    if (spotifyTrack.external_ids.isrc == musicKitTrack.isrc) { confidence += 8 }
+    
     return confidence
 }
