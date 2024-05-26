@@ -121,15 +121,15 @@ struct SpotifyPlaylist: Decodable {
             struct TrackObject: Decodable {
                 // Values if track is a TrackObject
                 struct Album: Decodable {
-                    var album_type: String
-                    var total_tracks: Int
-                    var images: [ExternalImage]
-                    var name: String
-                    var release_date: String
+                    var album_type: String = ""
+                    var total_tracks: Int = 0
+                    var images: [ExternalImage] = []
+                    var name: String = ""
+                    var release_date: String = ""
                 }
                 
                 struct Artist: Decodable {
-                    var name: String
+                    var name: String = ""
                 }
                 
                 struct ExternalIDs: Decodable {
@@ -139,15 +139,15 @@ struct SpotifyPlaylist: Decodable {
                 }
                 
                 
-                var album: Album
-                var artists: [Artist]
-                var disc_number: Int
-                var duration_ms: Int
-                var explicit: Bool
-                var external_ids: ExternalIDs
-                var id: String
-                var name: String
-                var track_number: Int
+                var album: Album = Album()
+                var artists: [Artist] = []
+                var disc_number: Int = 0
+                var duration_ms: Int = 0
+                var explicit: Bool = false
+                var external_ids: ExternalIDs = ExternalIDs()
+                var id: String = ""
+                var name: String = ""
+                var track_number: Int = 0
                 
                 // Values if track is an EpisodeObject
                 // Since we don't care about episodes, I'll just let the decoding fail on this one

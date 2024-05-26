@@ -82,29 +82,38 @@ class MusicKitController {
         }
     }
     
-    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> [Song?] {
+    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> [Song] {
         struct MatchedSong {
             var song: Song
             var confidence: Int
         }
         
-        let request = MusicCatalogResourceRequest<Song>(matching: \.isrc, equalTo: spotifyTrack.external_ids.isrc)
+        var spotifyTrackName = spotifyTrack.name.lowercased()
+        
+        // Replace fuck with f**k, since Apple Music doesn't allow that word
+        if (spotifyTrackName.contains("fuck")) {
+            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "fuck", with: "f**k")
+        }
+        var request = MusicCatalogSearchRequest(term: "\(spotifyTrackName) \(spotifyTrack.artists.first?.name.lowercased() ?? "")", types: [Song.self])
+        request.limit = 25
+
         var matchedSongs: [MatchedSong] = []
         
         do {
             let tracks = try await request.response()
-            for track in tracks.items {
-                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: track)
-                matchedSongs.append(MatchedSong(song: track, confidence: confidence))
+            
+            for song in tracks.songs {
+                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song)
+                matchedSongs.append(MatchedSong(song: song, confidence: confidence))
             }
             
             matchedSongs = matchedSongs.sorted(by: { a, b in
                 a.confidence > b.confidence
             })
             
-            let songs = matchedSongs.map { $0.song }
+            let confidenceSortedsongs = matchedSongs.map { $0.song }
             
-            return songs
+            return confidenceSortedsongs
         } catch {
             return []
         }

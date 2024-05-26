@@ -12,68 +12,43 @@ struct SpotifySyncSheet: View {
     @Environment(MusicKitController.self) private var musicKit
 
     var playlist: SpotifyPlaylist?
-    @State var musicKitSongs: [[Song?]] = []
+    @State var musicKitSongs: [[Song]] = []
     @State private var progress = 0.0
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
+            VStack {
                 if let playlist {
                     if (progress == 1.0) {
                         List {
+                            Label {
+                                Text("Go through the List to make sure every Song is correctly matched.")
+                                    .font(.headline)
+                            } icon: {
+                                Image(systemName: "exclamationmark.triangle")
+                            }
+                            .symbolRenderingMode(.multicolor)
+                            
                             ForEach(Array(musicKitSongs.enumerated()), id: \.offset) { index, matchedSongs in
-                                Section {
-                                    let spotifyTrack = playlist.tracks.items[index]
-                                    HStack(alignment: .center) {
-                                        Image("SpotifyIcon")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(height: 25)
-                                            .padding(.trailing, 10)
-                                        
-                                        ItemLabel(
-                                            name: spotifyTrack.track.name,
-                                            author: spotifyTrack.track.artists.first?.name ?? "",
-                                            imageURL: spotifyTrack.track.album.images.first?.url ?? ""
-                                        )
-                                    }
-                                    
-                                    if let musicKitTrack = matchedSongs.first {
-                                        NavigationLink {
-                                            List(matchedSongs, id: \.?.id) { song in
-                                                if let song {
-                                                    ItemLabel(
-                                                        name: song.title,
-                                                        author: song.artistName,
-                                                        imageURL: song.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
-                                                    )
-                                                } else {
-                                                    Text("Could not find this song in Apple Music")
-                                                }
-                                                
-                                            }
-                                            .navigationTitle("Alternatives")
-                                        } label: {
-                                            HStack(alignment: .center) {
-                                                Image("AppleMusicIcon")
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .frame(height: 25)
-                                                    .padding(.trailing, 10)
-
-                                                ItemLabel(
-                                                    name: musicKitTrack?.title ?? "",
-                                                    author: musicKitTrack?.artistName ?? "",
-                                                    imageURL: musicKitTrack?.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                        Text("Could not find this song in Apple Music")
-                                    }
-                                }
+                                SpotifySyncedTracks(spotifyTrack: playlist.tracks.items[index].track, matchedSongs: matchedSongs)
                             }
                         }
+                        
+                        Button {
+                            print("Adding Playlist to Apple Music")
+                        } label: {
+                            Label {
+                                Text("Add synced Playlist to Apple Music")
+                                    .fontWeight(.bold)
+                            } icon: {
+                                Image("AppleMusicIcon")
+                                    .resizable()
+                                    .scaledToFit()
+                            }
+                        }
+                        .frame(height: 25)
+                        .padding(.top, 10)
+                        .padding(.bottom, 20)
                         
                     } else {
                         ProgressView(value: progress) {
@@ -100,6 +75,10 @@ struct SpotifySyncSheet: View {
 }
 
 #Preview {
-    SpotifySyncSheet()
-        .environment(MusicKitController())
+    VStack {
+        
+    }.sheet(isPresented: .constant(true), content: {
+        SpotifySyncSheet()
+            .environment(MusicKitController())
+    })
 }
