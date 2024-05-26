@@ -12,8 +12,14 @@ struct SpotifySyncSheet: View {
     @Environment(MusicKitController.self) private var musicKit
 
     var playlist: SpotifyPlaylist?
-    @State var musicKitSongs: [[Song]] = []
+    
     @State private var progress = 0.0
+    @State var matchedPlaylist: [[Song]] = []
+    @State var selectedSongs: [Song] = []
+    
+    @State var creatingPlaylist: Bool = false
+    @State var showAlert: Bool = false
+    @State var playlistCreationMessage: String = ""
     
     var body: some View {
         NavigationStack {
@@ -21,38 +27,53 @@ struct SpotifySyncSheet: View {
                 if let playlist {
                     if (progress == 1.0) {
                         List {
-                            Label {
-                                Text("Go through the List to make sure every Song is correctly matched.")
-                                    .font(.headline)
-                            } icon: {
-                                Image(systemName: "exclamationmark.triangle")
-                            }
-                            .symbolRenderingMode(.multicolor)
-                            
-                            ForEach(Array(musicKitSongs.enumerated()), id: \.offset) { index, matchedSongs in
-                                SpotifySyncedTracks(spotifyTrack: playlist.tracks.items[index].track, matchedSongs: matchedSongs)
+                            ForEach(Array(matchedPlaylist.enumerated()), id: \.offset) { index, matchedSongs in
+                                SpotifySyncedTracks(spotifyTrack: playlist.tracks.items[index].track, matchedSongs: matchedSongs, selectedSongs: $selectedSongs)
                             }
                         }
                         
                         Button {
-                            print("Adding Playlist to Apple Music")
+                            creatingPlaylist = true
+                            Task {
+                                playlistCreationMessage = await musicKit.createPlaylist(playlistName: playlist.name, songs: selectedSongs)
+                                creatingPlaylist = false
+                                showAlert = true
+                            }
                         } label: {
-                            Label {
-                                Text("Add synced Playlist to Apple Music")
-                                    .fontWeight(.bold)
-                            } icon: {
-                                Image("AppleMusicIcon")
-                                    .resizable()
-                                    .scaledToFit()
+                            if (playlist.tracks.items.count != selectedSongs.count) {
+                                Label {
+                                    Text("Scroll to bottom to confirm matched Songs.")
+                                        .fontWeight(.bold)
+                                } icon: {
+                                    Image(systemName: "exclamationmark.triangle")
+                                }
+                                .symbolRenderingMode(.multicolor)
+                            } else {
+                                Label {
+                                    Text("Add synced Playlist to Apple Music")
+                                        .fontWeight(.bold)
+                                } icon: {
+                                    Image("AppleMusicIcon")
+                                        .resizable()
+                                        .scaledToFit()
+                                }
                             }
                         }
                         .frame(height: 25)
+                        .labelStyle(HorizontalAlignedLabel())
                         .padding(.top, 10)
                         .padding(.bottom, 20)
+                        .disabled(playlist.tracks.items.count != selectedSongs.count)
+                        .alert(
+                            playlistCreationMessage,
+                            isPresented: $showAlert
+                        ) {
+                            Button("OK") { showAlert.toggle() }
+                        }
                         
                     } else {
                         ProgressView(value: progress) {
-                            Text("Matched \(musicKitSongs.count) out of \(playlist.tracks.items.count)")
+                            Text("Matched \(matchedPlaylist.count) out of \(playlist.tracks.items.count)")
                         }
                         .padding()
                     }
@@ -65,10 +86,21 @@ struct SpotifySyncSheet: View {
         .task {
             if let playlist {
                 for track in playlist.tracks.items {
-                    let song = await musicKit.searchSongWithISRC(spotifyTrack: track.track)
-                    musicKitSongs.append(song)
-                    progress = Double(musicKitSongs.count) / Double(playlist.tracks.items.count)
+                    let matchedSongs = await musicKit.searchSongWithISRC(spotifyTrack: track.track)
+                    matchedPlaylist.append(matchedSongs)
+                    progress = Double(matchedPlaylist.count) / Double(playlist.tracks.items.count)
                 }
+            }
+        }
+        .disabled(creatingPlaylist)
+        .overlay {
+            if (creatingPlaylist) {
+                VStack {
+                    Text("Creating Playlist...")
+                    ProgressView()
+                }
+                .padding(10)
+                .background(.ultraThinMaterial)
             }
         }
     }

@@ -12,27 +12,27 @@ struct ContentView: View {
     @State private var musicKit = MusicKitController()
     
     var body: some View {
-        TabView {
-            SpotifyView()
-                .tabItem {
-                    Label("Spotify", systemImage: "music.note")
-                }
-                .environment(spotify)
-                .environment(musicKit)
-            
-            MusicKitView()
-                .tabItem {
-                    Label("Apple Music", systemImage: "music.note")
-                }
-                .environment(spotify)
-                .environment(musicKit)
-            
+        if (spotify.authSuccess == false || musicKit.authSuccess == false) {
             SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
                 .environment(spotify)
                 .environment(musicKit)
+        } else {
+            
+            TabView {
+                SpotifyView()
+                    .tabItem {
+                        Label("Spotify", systemImage: "music.note")
+                    }
+                    .environment(spotify)
+                    .environment(musicKit)
+                
+                MusicKitView()
+                    .tabItem {
+                        Label("Apple Music", systemImage: "music.note")
+                    }
+                    .environment(spotify)
+                    .environment(musicKit)
+            }
         }
     }
 }
