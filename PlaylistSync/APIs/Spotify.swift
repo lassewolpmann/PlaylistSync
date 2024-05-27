@@ -190,13 +190,42 @@ final class SpotifyController {
         if (statusCode == 200) {
             let playlist = try JSONDecoder().decode(SpotifyPlaylist.self, from: data)
             
-            // TODO: Fix limit of 100 songs
-            print(playlist.tracks.total, playlist.tracks.limit)
             return playlist
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)
             throw SpotifyError.dataError("Could not get Playlist")
         }
+    }
+    
+    func getPlaylistItems(url: String, total: Int) async throws -> [SpotifyPlaylist.Tracks.Track.TrackObject] {
+        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
+        
+        var tracks: [SpotifyPlaylist.Tracks.Track.TrackObject] = []
+        var requestURL: String? = url
+        
+        while (requestURL != nil) {
+            if let url = requestURL {
+                guard let url = URL(string: url) else { throw SpotifyError.urlError("Could not get Playlist Items URL") }
+                var request = URLRequest(url: url)
+                request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
+                
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let statusCode = (response as! HTTPURLResponse).statusCode
+                
+                if (statusCode == 200) {
+                    let playlist = try JSONDecoder().decode(SpotifyPlaylist.Tracks.self, from: data)
+                    requestURL = playlist.next
+                    
+                    let trackItems = playlist.items.map { $0.track }
+                    tracks.append(contentsOf: trackItems)
+                } else {
+                    let _ = try JSONDecoder().decode(GenericError.self, from: data)
+                    throw SpotifyError.dataError("Could not get Playlist")
+                }
+            }
+        }
+        
+        return tracks
     }
     
     func revokeToken() -> Void {

@@ -9,8 +9,7 @@ import SwiftUI
 import MusicKit
 
 struct SpotifySyncedTracks: View {
-    let spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject
-    let matchedSongs: [Song]
+    let matchedSongs: MatchedSongs
     
     @State private var selectedSong: Song?
     @Binding var selectedSongs: [Song]
@@ -25,19 +24,19 @@ struct SpotifySyncedTracks: View {
                     .padding(.trailing, 10)
                 
                 ItemLabel(
-                    name: spotifyTrack.name,
-                    author: spotifyTrack.artists.first?.name ?? "",
-                    imageURL: spotifyTrack.album.images.first?.url ?? ""
+                    name: matchedSongs.spotifySong.name,
+                    author: matchedSongs.spotifySong.artists.first?.name ?? "",
+                    imageURL: matchedSongs.spotifySong.album.images.first?.url ?? ""
                 )
             }
             
             if (selectedSong != nil) {
                 NavigationLink {
-                    List(matchedSongs, id: \.self, selection: $selectedSong) { song in
+                    List(matchedSongs.musicKitSongs, id: \.self.song, selection: $selectedSong) { matched in
                         ItemLabel(
-                            name: song.title,
-                            author: song.artistName,
-                            imageURL: song.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
+                            name: matched.song.title,
+                            author: matched.song.artistName,
+                            imageURL: matched.song.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
                         )
                         
                     }
@@ -60,12 +59,13 @@ struct SpotifySyncedTracks: View {
             } else {
                 Text("Could not find this song in Apple Music")
             }
+        } header: {
+            Text("\((matchedSongs.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
         }
         .onAppear {
-            if let firstSong = matchedSongs.first {
+            if let firstSong = matchedSongs.musicKitSongs.first {
                 if (selectedSong == nil) {
-                    // Only do it when no song is selected yet
-                    selectedSong = firstSong
+                    selectedSong = firstSong.song
                 }
             }
         }
@@ -74,20 +74,18 @@ struct SpotifySyncedTracks: View {
                 let index = selectedSongs.firstIndex(of: oldValue)
                 if let index {
                     selectedSongs.remove(at: index)
+                    
+                    if let newValue {
+                        selectedSongs.insert(newValue, at: index)
+                    }
                 }
             }
-            
-            if let newValue {
-                selectedSongs.append(newValue)
-            }
-            
-            print(selectedSongs.count)
         }
     }
 }
 
 #Preview {
     List {
-        SpotifySyncedTracks(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject(), matchedSongs: [], selectedSongs: .constant([]))
+        SpotifySyncedTracks(matchedSongs: MatchedSongs(musicKitSongs: [], spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject(album: SpotifyPlaylist.Tracks.Track.TrackObject.Album(album_type: "", total_tracks: 0, images: [], name: "", release_date: ""), artists: [], disc_number: 0, duration_ms: 0, explicit: false, external_ids: SpotifyPlaylist.Tracks.Track.TrackObject.ExternalIDs(), id: "", name: "", track_number: 0), maxConfidence: 0, maxConfidencePct: 0), selectedSongs: .constant([]))
     }
 }

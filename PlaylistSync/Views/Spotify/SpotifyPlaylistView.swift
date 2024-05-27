@@ -12,24 +12,29 @@ struct SpotifyPlaylistView: View {
     @Environment(MusicKitController.self) private var musicKit
 
     let playlistID: String
+    
     @State var playlist: SpotifyPlaylist?
+    @State var playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]?
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            if let playlist {
-                List(playlist.tracks.items, id: \.track.id) { item in
+            if let playlist, let playlistItems {
+                List(playlistItems, id: \.id) { item in
                     ItemLabel(
-                        name: item.track.name,
-                        author: item.track.artists.first?.name ?? "",
-                        imageURL: item.track.album.images.first?.url ?? ""
+                        name: item.name,
+                        author: item.artists.first?.name ?? "",
+                        imageURL: item.album.images.first?.url ?? ""
                     )
                 }
                 
-                SpotifySyncButton(playlist: playlist)
+                SpotifySyncButton(playlist: playlist, playlistItems: playlistItems)
                     .environment(spotify)
                     .environment(musicKit)
             } else {
-                ProgressView()
+                VStack {
+                    Text("Loading Playlist")
+                    ProgressView()
+                }
             }
             
             
@@ -38,6 +43,10 @@ struct SpotifyPlaylistView: View {
         .task {
             do {
                 playlist = try await spotify.getPlaylist(playlistID: playlistID)
+                
+                if let playlist {
+                    playlistItems = try await spotify.getPlaylistItems(url: playlist.tracks.href, total: playlist.tracks.total)
+                }
             } catch {
                 print(error)
             }
