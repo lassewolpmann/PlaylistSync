@@ -8,9 +8,23 @@
 import Foundation
 import MusicKit
 
+struct MatchedSong {
+    var song: Song
+    var confidence: Int
+}
+
+struct MatchedSongs {
+    var musicKitSongs: [MatchedSong]
+    var spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject
+    var maxConfidence: Int
+    var maxConfidencePct: Double
+}
+
 @Observable
 class MusicKitController {
     var authSuccess: Bool = false
+    
+    
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
@@ -82,18 +96,18 @@ class MusicKitController {
         }
     }
     
-    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> [Song] {
-        struct MatchedSong {
-            var song: Song
-            var confidence: Int
-        }
-        
+    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> MatchedSongs {
         var spotifyTrackName = spotifyTrack.name.lowercased()
         
         // Replace fuck with f**k, since Apple Music doesn't allow that word
         if (spotifyTrackName.contains("fuck")) {
             spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "fuck", with: "f**k")
         }
+        
+        if (spotifyTrackName.contains("`")) {
+            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "`", with: "'")
+        }
+        
         var request = MusicCatalogSearchRequest(term: "\(spotifyTrackName) \(spotifyTrack.artists.first?.name.lowercased() ?? "")", types: [Song.self])
         request.limit = 25
 
@@ -111,11 +125,14 @@ class MusicKitController {
                 a.confidence > b.confidence
             })
             
-            let confidenceSortedsongs = matchedSongs.map { $0.song }
+            guard let maxConfidence = matchedSongs.first?.confidence else { return MatchedSongs(musicKitSongs: [], spotifySong: spotifyTrack, maxConfidence: 0, maxConfidencePct: 0) }
             
-            return confidenceSortedsongs
+            // 36 is highest possible confidence score
+            let maxConfidencePct = (Double(maxConfidence) / 36) * 100
+            
+            return MatchedSongs(musicKitSongs: matchedSongs, spotifySong: spotifyTrack, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
-            return []
+            return MatchedSongs(musicKitSongs: [], spotifySong: spotifyTrack, maxConfidence: 0, maxConfidencePct: 0)
         }
     }
     
@@ -132,7 +149,7 @@ class MusicKitController {
         do {
             let library = MusicLibrary.shared
 
-            try await library.createPlaylist(name: playlistName, authorDisplayName: "PlaylistSync", items: songs)
+            try await library.createPlaylist(name: playlistName, description: "Created by PlaylistSync", items: songs)
             
             return "Successfully created Playlist in your Library."
         } catch {

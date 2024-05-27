@@ -12,14 +12,16 @@ struct SpotifySyncButton: View {
     @Environment(MusicKitController.self) private var musicKit
     
     @State var showSheet: Bool = false
-    var playlist: SpotifyPlaylist?
+    
+    let playlist: SpotifyPlaylist
+    let playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]
     
     var body: some View {
         Button {
             showSheet.toggle()
         } label: {
             Label {
-                Text("Sync \(playlist?.name ?? "unknown") to Apple Music")
+                Text("Sync \(playlist.name) to Apple Music")
                     .fontWeight(.bold)
             } icon: {
                 Image("AppleMusicIcon")
@@ -35,7 +37,7 @@ struct SpotifySyncButton: View {
         )
         .padding(.bottom, 10)
         .sheet(isPresented: $showSheet, content: {
-            SpotifySyncSheet(playlist: playlist)
+            SpotifySyncSheet(playlist: playlist, playlistItems: playlistItems)
                 .environment(musicKit)
                 .presentationBackground(.ultraThinMaterial)
         })
@@ -43,7 +45,7 @@ struct SpotifySyncButton: View {
 }
 
 #Preview {
-    SpotifySyncButton()
+    SpotifySyncButton(playlist: SpotifyPlaylist(collaborative: false, description: "", external_urls: ExternalURLs(spotify: ""), followers: Followers(total: 0), href: "", id: "", images: [], name: "", owner: Owner(external_urls: ExternalURLs(spotify: ""), href: "", id: "", type: "", uri: ""), public: false, snapshot_id: "", tracks: SpotifyPlaylist.Tracks(href: "", limit: 0, offset: 0, total: 0, items: []), type: "", uri: ""), playlistItems: [])
         .environment(SpotifyController())
         .environment(MusicKitController())
 }
