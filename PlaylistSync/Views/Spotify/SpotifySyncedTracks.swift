@@ -15,12 +15,12 @@ struct SpotifySyncedTracks: View {
     @Binding var selectedSongs: [Song]
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("\((matchedSongs.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             
-            Divider().padding(5)
+            Divider()
             
             HStack(alignment: .center) {
                 ItemLabel(
@@ -45,7 +45,6 @@ struct SpotifySyncedTracks: View {
                             author: matched.song.artistName,
                             imageURL: matched.song.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
                         )
-                        
                     }
                     .navigationTitle("Select Alternative")
                 } label: {
@@ -67,14 +66,14 @@ struct SpotifySyncedTracks: View {
             } else {
                 HStack(alignment: .center) {
                     Label {
-                        Text("No Song selected.")
+                        Text("Could not find this song in Apple Music.")
                             .bold()
                     } icon: {
                         Image(systemName: "x.circle")
                             .symbolRenderingMode(.multicolor)
                             .foregroundStyle(.red)
                     }
-                    
+                    .labelStyle(HorizontalAlignedLabel())
                     
                     Spacer()
                     

@@ -16,6 +16,8 @@ struct SpotifyPlaylistView: View {
     @State var playlist: SpotifyPlaylist?
     @State var playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]?
     
+    @State var showSheet: Bool = false
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             if let playlist, let playlistItems {
@@ -26,10 +28,13 @@ struct SpotifyPlaylistView: View {
                         imageURL: item.album.images.first?.url ?? ""
                     )
                 }
+                .sheet(isPresented: $showSheet, content: {
+                    SpotifySyncSheet(playlistName: playlist.name, playlistItems: playlistItems)
+                        .environment(musicKit)
+                        .presentationBackground(.ultraThinMaterial)
+                })
                 
-                SpotifySyncButton(playlistName: playlist.name, playlistItems: playlistItems)
-                    .environment(spotify)
-                    .environment(musicKit)
+                SpotifySyncButton(showSheet: $showSheet, playlistName: playlist.name)
             } else {
                 VStack {
                     Text("Loading Playlist")
@@ -55,7 +60,10 @@ struct SpotifyPlaylistView: View {
 }
 
 #Preview {
-    SpotifyPlaylistView(playlistID: "3cEYpjA9oz9GiPac4AsH4n", playlist: SpotifyPlaylist(), playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()])
-        .environment(SpotifyController())
-        .environment(MusicKitController())
+    NavigationStack {
+        SpotifyPlaylistView(playlistID: "3cEYpjA9oz9GiPac4AsH4n", playlist: SpotifyPlaylist(), playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()])
+            .environment(SpotifyController())
+            .environment(MusicKitController())
+    }
+    
 }

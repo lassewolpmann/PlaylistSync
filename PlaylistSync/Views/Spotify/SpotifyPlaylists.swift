@@ -12,16 +12,24 @@ struct SpotifyPlaylists: View {
     @State var playlists: UserPlaylists?
 
     var body: some View {
-        List(playlists?.items ?? [], id: \.self) { playlist in
-            NavigationLink {
-                SpotifyPlaylistView(playlistID: playlist.id)
-                    .environment(spotify)
-            } label: {
-                ItemLabel(
-                    name: playlist.name,
-                    author: playlist.owner.display_name ?? "",
-                    imageURL: playlist.images.first?.url ?? ""
-                )
+        Group {
+            if let playlists {
+                List(playlists.items, id: \.self) { playlist in
+                    NavigationLink {
+                        SpotifyPlaylistView(playlistID: playlist.id)
+                            .environment(spotify)
+                    } label: {
+                        ItemLabel(
+                            name: playlist.name,
+                            author: playlist.owner.display_name ?? "",
+                            imageURL: playlist.images.first?.url ?? ""
+                        )
+                    }
+                }
+            } else {
+                Text("No Playlists found")
+                    .font(.title)
+                    .bold()
             }
         }
         .task {
@@ -44,6 +52,9 @@ struct SpotifyPlaylists: View {
 }
 
 #Preview {
-    SpotifyPlaylists(playlists: UserPlaylists())
-        .environment(SpotifyController())
+    NavigationStack {
+        SpotifyPlaylists(playlists: UserPlaylists())
+            .environment(SpotifyController())
+            .navigationTitle("Spotify")
+    }
 }

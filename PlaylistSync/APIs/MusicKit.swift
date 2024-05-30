@@ -116,7 +116,7 @@ class MusicKitController {
             spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "`", with: "'")
         }
         
-        var request = MusicCatalogSearchRequest(term: "\(spotifyTrackName) \(spotifyTrack.artists.first?.name.lowercased() ?? "")", types: [Song.self])
+        var request = MusicCatalogSearchRequest(term: spotifyTrackName, types: [Song.self])
         request.limit = 25
 
         var matchedSongs: [MatchedSong] = []

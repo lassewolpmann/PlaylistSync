@@ -19,9 +19,7 @@ struct SpotifySyncSheet: View {
     @State var selectedSongs: [Song] = []
     @State private var matchedPlaylist: [MatchedSongs] = []
     
-    @State private var creatingPlaylist: Bool = false
-    @State private var showAlert: Bool = false
-    @State private var playlistCreationMessage: String = ""
+    @State var creatingPlaylist: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -42,33 +40,9 @@ struct SpotifySyncSheet: View {
                         EditButton()
                     }
                     
-                    Button {
-                        creatingPlaylist = true
-                        Task {
-                            playlistCreationMessage = await musicKit.createPlaylist(playlistName: playlistName, songs: selectedSongs)
-                            creatingPlaylist = false
-                            showAlert = true
-                        }
-                    } label: {
-                        Label {
-                            Text("Add synced Playlist to Apple Music")
-                                .fontWeight(.bold)
-                        } icon: {
-                            Image("AppleMusicIcon")
-                                .resizable()
-                                .scaledToFit()
-                        }
-                    }
-                    .frame(height: 25)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
-                    .disabled(playlistItems.count != selectedSongs.count)
-                    .alert(
-                        playlistCreationMessage,
-                        isPresented: $showAlert
-                    ) {
-                        Button("OK") { showAlert.toggle() }
-                    }
+                    SpotifyCreatePlaylistButton(playlistName: playlistName, selectedSongs: selectedSongs, creatingPlaylist: $creatingPlaylist)
+                        .disabled(matchedPlaylist.count != selectedSongs.count)
+                        .environment(musicKit)
                 } else {
                     ProgressView(value: progress) {
                         Text("Matched \(matchedPlaylist.count) out of \(playlistItems.count)")
@@ -93,7 +67,6 @@ struct SpotifySyncSheet: View {
             }
             
             // Step 3: Go through matchedPlaylist and add first matched song from Apple Music to selectedSongs
-            // Step 4: Calculate progress
             matchedPlaylist.forEach { matchedSongs in
                 if let song = matchedSongs.musicKitSongs.first {
                     selectedSongs.append(song.song)

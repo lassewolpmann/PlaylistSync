@@ -13,25 +13,37 @@ func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject,
 
     if (spotifyTrack.name == musicKitTrack.title) { confidence += 1 }
     
-    let spotifySongDuration = floor(Double(spotifyTrack.duration_ms) / 1000)
-    let musicKitSongDuration = floor(musicKitTrack.duration ?? 0.0)
-    if (spotifySongDuration == musicKitSongDuration) { confidence += 2 }
+    if (spotifyTrack.disc_number == musicKitTrack.discNumber) { confidence += 2 }
     
-    let spotifyArtistName = spotifyTrack.artists.first?.name.lowercased()
-    let musicKitArtistName = musicKitTrack.artistName.lowercased()
-    if (spotifyArtistName == musicKitArtistName) { confidence += 3 }
+    if (spotifyTrack.track_number == musicKitTrack.trackNumber) { confidence += 3 }
     
     if (spotifyTrack.album.name == musicKitTrack.albumTitle) { confidence += 4 }
     
-    if (spotifyTrack.disc_number == musicKitTrack.discNumber) { confidence += 5 }
+    let spotifyArtistName = spotifyTrack.artists.first?.name.lowercased()
+    let musicKitArtistName = musicKitTrack.artistName.lowercased()
+    if (spotifyArtistName == musicKitArtistName) { confidence += 5 }
     
-    if (spotifyTrack.track_number == musicKitTrack.trackNumber) { confidence += 6 }
+    if (spotifyTrack.external_ids.isrc == musicKitTrack.isrc) { confidence += 6 }
+    
+    let spotifySongDuration = floor(Double(spotifyTrack.duration_ms) / 1000)
+    let musicKitSongDuration = floor(musicKitTrack.duration ?? 0.0)
+    if (spotifySongDuration == musicKitSongDuration) { confidence += 7 }
     
     let spotifyReleaseDate = spotifyTrack.album.release_date
-    let musicKitReleaseDate = musicKitTrack.releaseDate?.ISO8601Format().components(separatedBy: "T").first
-    if (spotifyReleaseDate == musicKitReleaseDate) { confidence += 7 }
+    let musicKitReleaseDate = musicKitTrack.releaseDate
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone(abbreviation: "UTC")
+    if let date = formatter.date(from: spotifyReleaseDate) {
+        let spotifyTimeInterval = date.timeIntervalSince1970
+        let musicKitTimeInterval = musicKitReleaseDate?.timeIntervalSince1970
+        
+        if (spotifyTimeInterval == musicKitTimeInterval) { confidence += 8 }
+    }
     
-    if (spotifyTrack.external_ids.isrc == musicKitTrack.isrc) { confidence += 8 }
+    // TODO: Include Shazam Kit
+    let spotifyPreviewURL = spotifyTrack.preview_url
+    let musicKitPreviewURL = musicKitTrack.previewAssets?.first?.url
     
     return confidence
 }
