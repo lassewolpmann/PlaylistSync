@@ -15,19 +15,26 @@ struct SpotifySyncedTracks: View {
     @Binding var selectedSongs: [Song]
     
     var body: some View {
-        Section {
+        VStack(alignment: .leading) {
+            Text("\((matchedSongs.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            
+            Divider().padding(5)
+            
             HStack(alignment: .center) {
-                Image("SpotifyIcon")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 25)
-                    .padding(.trailing, 10)
-                
                 ItemLabel(
                     name: matchedSongs.spotifySong.name,
                     author: matchedSongs.spotifySong.artists.first?.name ?? "",
                     imageURL: matchedSongs.spotifySong.album.images.first?.url ?? ""
                 )
+                
+                Spacer()
+                
+                Image("SpotifyIcon")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 25)
             }
             
             if (selectedSong != nil) {
@@ -43,24 +50,40 @@ struct SpotifySyncedTracks: View {
                     .navigationTitle("Select Alternative")
                 } label: {
                     HStack(alignment: .center) {
-                        Image("AppleMusicIcon")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 25)
-                            .padding(.trailing, 10)
-
                         ItemLabel(
                             name: selectedSong?.title ?? "",
                             author: selectedSong?.artistName ?? "",
                             imageURL: selectedSong?.artwork?.url(width: 150, height: 150)?.absoluteString ?? ""
                         )
+                        
+                        Spacer()
+                        
+                        Image("AppleMusicIcon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 25)
                     }
                 }
             } else {
-                Text("Could not find this song in Apple Music")
+                HStack(alignment: .center) {
+                    Label {
+                        Text("No Song selected.")
+                            .bold()
+                    } icon: {
+                        Image(systemName: "x.circle")
+                            .symbolRenderingMode(.multicolor)
+                            .foregroundStyle(.red)
+                    }
+                    
+                    
+                    Spacer()
+                    
+                    Image("AppleMusicIcon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 25)
+                }
             }
-        } header: {
-            Text("\((matchedSongs.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
         }
         .onAppear {
             if let firstSong = matchedSongs.musicKitSongs.first {

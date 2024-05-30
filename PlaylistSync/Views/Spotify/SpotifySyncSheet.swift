@@ -11,30 +11,41 @@ import MusicKit
 struct SpotifySyncSheet: View {
     @Environment(MusicKitController.self) private var musicKit
 
-    let playlist: SpotifyPlaylist
+    let playlistName: String
     let playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]
     
     @State private var progress: Double = 0
     
-    @State var matchedPlaylist: [MatchedSongs] = []
     @State var selectedSongs: [Song] = []
+    @State private var matchedPlaylist: [MatchedSongs] = []
     
-    @State var creatingPlaylist: Bool = false
-    @State var showAlert: Bool = false
-    @State var playlistCreationMessage: String = ""
+    @State private var creatingPlaylist: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var playlistCreationMessage: String = ""
     
     var body: some View {
         NavigationStack {
             VStack {
                 if (progress == 1.0) {
-                    List(matchedPlaylist, id: \.spotifySong.id) { matchedSongs in
-                        SpotifySyncedTracks(matchedSongs: matchedSongs, selectedSongs: $selectedSongs)
+                    List {
+                        ForEach(matchedPlaylist, id: \.self) { matchedSongs in
+                            Section {
+                                SpotifySyncedTracks(matchedSongs: matchedSongs, selectedSongs: $selectedSongs)
+                            }
+                        }
+                        .onDelete(perform: { indexSet in
+                            matchedPlaylist.remove(atOffsets: indexSet)
+                            selectedSongs.remove(atOffsets: indexSet)
+                        })
+                    }
+                    .toolbar {
+                        EditButton()
                     }
                     
                     Button {
                         creatingPlaylist = true
                         Task {
-                            playlistCreationMessage = await musicKit.createPlaylist(playlistName: playlist.name, songs: selectedSongs)
+                            playlistCreationMessage = await musicKit.createPlaylist(playlistName: playlistName, songs: selectedSongs)
                             creatingPlaylist = false
                             showAlert = true
                         }
@@ -58,7 +69,6 @@ struct SpotifySyncSheet: View {
                     ) {
                         Button("OK") { showAlert.toggle() }
                     }
-                    
                 } else {
                     ProgressView(value: progress) {
                         Text("Matched \(matchedPlaylist.count) out of \(playlistItems.count)")
@@ -70,19 +80,24 @@ struct SpotifySyncSheet: View {
             .navigationTitle("Matched Songs")
         }
         .task {
+            // Step 1: Try to match Spotify Song with Apple Music Search
             for track in playlistItems {
                 let matchedSongs = await musicKit.searchSongWithISRC(spotifyTrack: track)
                 matchedPlaylist.append(matchedSongs)
-                
-                if let song = matchedSongs.musicKitSongs.first {
-                    selectedSongs.append(song.song)
-                }
-                
                 progress = Double(matchedPlaylist.count) / Double(playlistItems.count)
             }
             
+            // Step 2: Sort by lowest confidence first
             matchedPlaylist.sort { a, b in
                 return a.maxConfidence < b.maxConfidence
+            }
+            
+            // Step 3: Go through matchedPlaylist and add first matched song from Apple Music to selectedSongs
+            // Step 4: Calculate progress
+            matchedPlaylist.forEach { matchedSongs in
+                if let song = matchedSongs.musicKitSongs.first {
+                    selectedSongs.append(song.song)
+                }
             }
         }
         .disabled(creatingPlaylist)
@@ -93,7 +108,7 @@ struct SpotifySyncSheet: View {
                     ProgressView()
                 }
                 .padding(10)
-                .background(.ultraThinMaterial)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
             }
         }
     }
@@ -103,7 +118,7 @@ struct SpotifySyncSheet: View {
     VStack {
         
     }.sheet(isPresented: .constant(true), content: {
-        SpotifySyncSheet(playlist: SpotifyPlaylist(collaborative: false, description: "", external_urls: ExternalURLs(spotify: ""), followers: Followers(total: 0), href: "", id: "", images: [], name: "", owner: Owner(external_urls: ExternalURLs(spotify: ""), href: "", id: "", type: "", uri: ""), public: false, snapshot_id: "", tracks: SpotifyPlaylist.Tracks(href: "", limit: 0, offset: 0, total: 0, items: []), type: "", uri: ""), playlistItems: [])
+        SpotifySyncSheet(playlistName: SpotifyPlaylist().name, playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()])
             .environment(MusicKitController())
     })
 }
