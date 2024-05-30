@@ -27,7 +27,7 @@ struct SpotifyPlaylistView: View {
                     )
                 }
                 
-                SpotifySyncButton(playlist: playlist, playlistItems: playlistItems)
+                SpotifySyncButton(playlistName: playlist.name, playlistItems: playlistItems)
                     .environment(spotify)
                     .environment(musicKit)
             } else {
@@ -55,7 +55,7 @@ struct SpotifyPlaylistView: View {
 }
 
 #Preview {
-    SpotifyPlaylistView(playlistID: "3cEYpjA9oz9GiPac4AsH4n")
+    SpotifyPlaylistView(playlistID: "3cEYpjA9oz9GiPac4AsH4n", playlist: SpotifyPlaylist(), playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()])
         .environment(SpotifyController())
         .environment(MusicKitController())
 }

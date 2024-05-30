@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SpotifyPlaylists: View {
     @Environment(SpotifyController.self) private var spotify
-    @State private var playlists: UserPlaylists?
+    @State var playlists: UserPlaylists?
 
     var body: some View {
         List(playlists?.items ?? [], id: \.self) { playlist in
@@ -44,6 +44,6 @@ struct SpotifyPlaylists: View {
 }
 
 #Preview {
-    SpotifyPlaylists()
+    SpotifyPlaylists(playlists: UserPlaylists())
         .environment(SpotifyController())
 }
