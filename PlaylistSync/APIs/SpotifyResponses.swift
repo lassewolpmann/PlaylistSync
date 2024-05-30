@@ -98,8 +98,8 @@ struct UserPlaylists: Decodable {
     var next: String?
     var offset: Int = 0
     var previous: String?
-    var total: Int = 1
-    var items: [UserPlaylists.Playlist] = [UserPlaylists.Playlist()]
+    var total: Int = 2
+    var items: [UserPlaylists.Playlist] = [UserPlaylists.Playlist(), UserPlaylists.Playlist()]
 }
 
 struct SpotifyPlaylist: Decodable {
@@ -136,6 +136,7 @@ struct SpotifyPlaylist: Decodable {
                 var external_ids: SpotifyPlaylist.Tracks.Track.TrackObject.ExternalIDs = SpotifyPlaylist.Tracks.Track.TrackObject.ExternalIDs()
                 var id: String = "preview_track_object"
                 var name: String = "Preview Track Object"
+                var preview_url: String?
                 var track_number: Int = 0
                 
                 // Values if track is an EpisodeObject
