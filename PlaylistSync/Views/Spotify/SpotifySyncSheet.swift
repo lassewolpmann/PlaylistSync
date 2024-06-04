@@ -15,6 +15,7 @@ struct SpotifySyncSheet: View {
     let playlistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]
     
     @State private var progress: Double = 0
+    @State private var eta: Double = 0
     
     @State var selectedSongs: [Song] = []
     @State private var matchedPlaylist: [MatchedSongs] = []
@@ -23,8 +24,8 @@ struct SpotifySyncSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                if (progress == 1.0) {
+            if (progress == 1.0) {
+                VStack {
                     List {
                         ForEach(matchedPlaylist, id: \.self) { matchedSongs in
                             Section {
@@ -43,22 +44,37 @@ struct SpotifySyncSheet: View {
                     SpotifyCreatePlaylistButton(playlistName: playlistName, selectedSongs: selectedSongs, creatingPlaylist: $creatingPlaylist)
                         .disabled(matchedPlaylist.count != selectedSongs.count)
                         .environment(musicKit)
-                } else {
+                }
+                .navigationTitle("Matched Songs")
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
                     ProgressView(value: progress) {
                         Text("Matched \(matchedPlaylist.count) out of \(playlistItems.count)")
                     }
-                    .padding()
+                    
+                    Text("Estimated time remaining: \(Int(eta)) \(Int(eta) == 1 ? "second" : "seconds")")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
+                .padding()
+                .navigationTitle("Matching \(playlistName)")
             }
-            .labelStyle(HorizontalAlignedLabel())
-            .navigationTitle("Matched Songs")
         }
+        .labelStyle(HorizontalAlignedLabel())
         .task {
+            var matchingTime: [Double] = []
+            
             // Step 1: Try to match Spotify Song with Apple Music Search
             for track in playlistItems {
+                let startingTimestamp = Date().timeIntervalSince1970
                 let matchedSongs = await musicKit.searchSongWithISRC(spotifyTrack: track)
+                let endingTimestamp = Date().timeIntervalSince1970
+                
+                matchingTime.append(endingTimestamp - startingTimestamp)
+                                                
                 matchedPlaylist.append(matchedSongs)
                 progress = Double(matchedPlaylist.count) / Double(playlistItems.count)
+                eta = calculateRemainingTime(matchingTime: matchingTime, remainingSongs: playlistItems.count - matchedPlaylist.count)
             }
             
             // Step 2: Sort by lowest confidence first

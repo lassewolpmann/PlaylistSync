@@ -47,3 +47,10 @@ func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject,
     
     return confidence
 }
+
+func calculateRemainingTime(matchingTime: [Double], remainingSongs: Int) -> Double {
+    let totalTime = matchingTime.reduce(0, +)
+    let averageTime = totalTime / Double(matchingTime.count)
+    
+    return averageTime * Double(remainingSongs)
+}

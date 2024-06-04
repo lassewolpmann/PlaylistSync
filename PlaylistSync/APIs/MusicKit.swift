@@ -108,15 +108,24 @@ class MusicKitController {
         var spotifyTrackName = spotifyTrack.name.lowercased()
         
         // Replace fuck with f**k, since Apple Music doesn't allow that word
-        if (spotifyTrackName.contains("fuck")) {
-            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "fuck", with: "f**k")
+        if (spotifyTrackName.lowercased().contains("fuck")) {
+            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "fuck", with: "f**k", options: .caseInsensitive)
         }
         
+        
+        // Replace ` with ' for better results
         if (spotifyTrackName.contains("`")) {
             spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "`", with: "'")
         }
         
-        var request = MusicCatalogSearchRequest(term: spotifyTrackName, types: [Song.self])
+        // Remove "Remastered" from search since Apple Music doesn't use that word in their song titles
+        if (spotifyTrackName.lowercased().contains("Remastered")) {
+            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "remastered", with: "", options: .caseInsensitive)
+        }
+        
+        let spotifyArtistName = spotifyTrack.artists.first?.name ?? ""
+        
+        var request = MusicCatalogSearchRequest(term: "\(spotifyTrackName) \(spotifyArtistName)", types: [Song.self])
         request.limit = 25
 
         var matchedSongs: [MatchedSong] = []

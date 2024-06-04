@@ -77,7 +77,6 @@
 				25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */,
 				25520F4D2BFDBA6200BAFC46 /* Spotify.swift */,
 				2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */,
-				25816C7A2C02452400F9D7FE /* MatchingAlgorithm.swift */,
 			);
 			path = APIs;
 			sourceTree = "<group>";
@@ -101,6 +100,7 @@
 		257A68A62BFCFD080056916E /* PlaylistSync */ = {
 			isa = PBXGroup;
 			children = (
+				25C5BC942C0F0CA40098A9F3 /* Helpers */,
 				25520F4A2BFDBA5300BAFC46 /* APIs */,
 				2595CE742BFDFC2700938A15 /* Views */,
 				25520F472BFDB8B500BAFC46 /* Info.plist */,
@@ -164,6 +164,14 @@
 				2543EFB62C0080B800BBC358 /* MusicKitPlaylistTrack.swift */,
 			);
 			path = MusicKit;
+			sourceTree = "<group>";
+		};
+		25C5BC942C0F0CA40098A9F3 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				25816C7A2C02452400F9D7FE /* MatchingAlgorithm.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
