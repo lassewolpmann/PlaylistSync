@@ -10,10 +10,11 @@ import MusicKit
 
 struct SpotifySyncSheet: View {
     @Environment(MusicKitController.self) private var musicKit
-    @Environment(SpotifyController.self) private var spotify
 
     let spotifyPlaylistName: String
     let spotifyPlaylistItems: [SpotifyPlaylist.Tracks.Track.TrackObject]
+    let matchingLimit: Double
+    let useAdvancedMatching: Bool
     
     @State private var progress: Double = 0
     @State private var eta: Double = 0
@@ -68,7 +69,7 @@ struct SpotifySyncSheet: View {
             for spotifyTrack in spotifyPlaylistItems {
                 do {
                     let startingTimestamp = Date().timeIntervalSince1970
-                    let matchedSongs = try await musicKit.searchSongWithISRC(spotifyTrack: spotifyTrack)
+                    let matchedSongs = try await musicKit.searchSongWithISRC(spotifyTrack: spotifyTrack, limit: matchingLimit, advancedMatching: useAdvancedMatching)
                     let endingTimestamp = Date().timeIntervalSince1970
                     
                     matchingTime.append(endingTimestamp - startingTimestamp)
@@ -115,7 +116,7 @@ struct SpotifySyncSheet: View {
     VStack {
         
     }.sheet(isPresented: .constant(true), content: {
-        SpotifySyncSheet(spotifyPlaylistName: SpotifyPlaylist().name, spotifyPlaylistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()])
+        SpotifySyncSheet(spotifyPlaylistName: SpotifyPlaylist().name, spotifyPlaylistItems: [SpotifyPlaylist.Tracks.Track.TrackObject()], matchingLimit: 5.0, useAdvancedMatching: false)
             .environment(MusicKitController())
     })
 }

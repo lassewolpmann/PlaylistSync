@@ -107,7 +107,7 @@ class MusicKitController {
         }
     }
     
-    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async throws -> MatchedSongs {
+    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject, limit: Double, advancedMatching: Bool) async throws -> MatchedSongs {
         // Split name at "-" and "(", since they usually add information that might confuse the Apple Music Search
         var name = spotifyTrack.name.components(separatedBy: "-").first ?? spotifyTrack.name
         name = name.components(separatedBy: "(").first ?? name
@@ -119,14 +119,14 @@ class MusicKitController {
         let artist = spotifyTrack.artists.first?.name ?? ""
                 
         var request = MusicCatalogSearchRequest(term: "\(name) \(artist)", types: [Song.self])
-        request.limit = 10
+        request.limit = Int(limit)
         
         do {
             let result = try await request.response()
             
             let songs = result.songs
             let matchedSongs = songs.map { song in
-                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song)
+                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song, advancedMatching: advancedMatching)
                 return MatchedSong(song: song, confidence: confidence)
             }.sorted(by: { a, b in
                 a.confidence > b.confidence
@@ -135,7 +135,7 @@ class MusicKitController {
             guard let maxConfidence = matchedSongs.first?.confidence else { throw MusicKitError.matchingError("Could not match song") }
             
             // 45 is highest possible confidence score
-            let maxConfidencePct = (Double(maxConfidence) / 45) * 100
+            let maxConfidencePct = advancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
             
             return MatchedSongs(musicKitSongs: matchedSongs, spotifySong: spotifyTrack, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
