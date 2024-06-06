@@ -8,6 +8,11 @@
 import Foundation
 import MusicKit
 
+enum MusicKitError: Error {
+    case matchingError(String)
+    case resourceError(String)
+}
+
 struct MatchedSong: Hashable {
     var song: Song
     var confidence: Int
@@ -22,17 +27,15 @@ struct MatchedSongs: Hashable {
         hasher.combine(spotifySong.id)
     }
     
-    var musicKitSongs: [MatchedSong]
+    var musicKitSongs: [MatchedSong] = []
     var spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject
-    var maxConfidence: Int
-    var maxConfidencePct: Double
+    var maxConfidence: Int = 0
+    var maxConfidencePct: Double = 0.0
 }
 
 @Observable
 class MusicKitController {
     var authSuccess: Bool = false
-    
-    
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
@@ -104,56 +107,43 @@ class MusicKitController {
         }
     }
     
-    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async -> MatchedSongs {
-        var spotifyTrackName = spotifyTrack.name.lowercased()
+    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject) async throws -> MatchedSongs {
+        // Split name at "-" and "(", since they usually add information that might confuse the Apple Music Search
+        var name = spotifyTrack.name.components(separatedBy: "-").first ?? spotifyTrack.name
+        name = name.components(separatedBy: "(").first ?? name
+        name = name.replacingOccurrences(of: "`", with: "'")
+        name = name.replacingOccurrences(of: "fuck", with: "f**k", options: .caseInsensitive)
+        name = name.trimmingCharacters(in: .whitespaces)
         
-        // Replace fuck with f**k, since Apple Music doesn't allow that word
-        if (spotifyTrackName.lowercased().contains("fuck")) {
-            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "fuck", with: "f**k", options: .caseInsensitive)
-        }
-        
-        
-        // Replace ` with ' for better results
-        if (spotifyTrackName.contains("`")) {
-            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "`", with: "'")
-        }
-        
-        // Remove "Remastered" from search since Apple Music doesn't use that word in their song titles
-        if (spotifyTrackName.lowercased().contains("Remastered")) {
-            spotifyTrackName = spotifyTrackName.replacingOccurrences(of: "remastered", with: "", options: .caseInsensitive)
-        }
-        
-        let spotifyArtistName = spotifyTrack.artists.first?.name ?? ""
-        
-        var request = MusicCatalogSearchRequest(term: "\(spotifyTrackName) \(spotifyArtistName)", types: [Song.self])
-        request.limit = 25
-
-        var matchedSongs: [MatchedSong] = []
+        // Only taking the first artist should be enough and avoids confusion when listing multiple artists
+        let artist = spotifyTrack.artists.first?.name ?? ""
+                
+        var request = MusicCatalogSearchRequest(term: "\(name) \(artist)", types: [Song.self])
+        request.limit = 10
         
         do {
-            let tracks = try await request.response()
+            let result = try await request.response()
             
-            for song in tracks.songs {
+            let songs = result.songs
+            let matchedSongs = songs.map { song in
                 let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song)
-                matchedSongs.append(MatchedSong(song: song, confidence: confidence))
-            }
-            
-            matchedSongs = matchedSongs.sorted(by: { a, b in
+                return MatchedSong(song: song, confidence: confidence)
+            }.sorted(by: { a, b in
                 a.confidence > b.confidence
             })
             
-            guard let maxConfidence = matchedSongs.first?.confidence else { return MatchedSongs(musicKitSongs: [], spotifySong: spotifyTrack, maxConfidence: 0, maxConfidencePct: 0) }
+            guard let maxConfidence = matchedSongs.first?.confidence else { throw MusicKitError.matchingError("Could not match song") }
             
-            // 36 is highest possible confidence score
-            let maxConfidencePct = (Double(maxConfidence) / 36) * 100
+            // 45 is highest possible confidence score
+            let maxConfidencePct = (Double(maxConfidence) / 45) * 100
             
             return MatchedSongs(musicKitSongs: matchedSongs, spotifySong: spotifyTrack, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
-            return MatchedSongs(musicKitSongs: [], spotifySong: spotifyTrack, maxConfidence: 0, maxConfidencePct: 0)
+            throw MusicKitError.resourceError("Could not find song \(spotifyTrack.name) \(spotifyTrack.artists.first?.name ?? "")")
         }
     }
     
-    func createPlaylist(playlistName: String, songs: [Song]) async -> String {
+    func createPlaylist(playlistName: String, songs: [Song?]) async -> String {
         let request = MusicLibrarySearchRequest(term: playlistName, types: [Playlist.self])
         
         do {
@@ -166,7 +156,7 @@ class MusicKitController {
         do {
             let library = MusicLibrary.shared
 
-            try await library.createPlaylist(name: playlistName, description: "Created by PlaylistSync", items: songs)
+            try await library.createPlaylist(name: playlistName, description: "Created by PlaylistSync", items: songs.compactMap { $0 }) // This removes all nil values
             
             return "Successfully created Playlist in your Library."
         } catch {

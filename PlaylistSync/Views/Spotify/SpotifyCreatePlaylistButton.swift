@@ -12,7 +12,7 @@ struct SpotifyCreatePlaylistButton: View {
     @Environment(MusicKitController.self) private var musicKit
 
     let playlistName: String
-    let selectedSongs: [Song]
+    let selectedSongs: [Song?]
     
     @State private var showAlert: Bool = false
     @State private var playlistCreationMessage: String = ""

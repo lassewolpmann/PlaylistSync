@@ -29,8 +29,9 @@ struct SpotifyPlaylistView: View {
                     )
                 }
                 .sheet(isPresented: $showSheet, content: {
-                    SpotifySyncSheet(playlistName: playlist.name, playlistItems: playlistItems)
+                    SpotifySyncSheet(spotifyPlaylistName: playlist.name, spotifyPlaylistItems: playlistItems)
                         .environment(musicKit)
+                        .environment(spotify)
                         .presentationBackground(.ultraThinMaterial)
                 })
                 

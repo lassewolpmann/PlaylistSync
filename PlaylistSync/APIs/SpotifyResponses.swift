@@ -61,6 +61,12 @@ struct UserData: Decodable {
     var uri: String = ""
 }
 
+struct ExternalIDs: Decodable {
+    var isrc: String?
+    var ean: String?
+    var upc: String?
+}
+
 struct UserPlaylists: Decodable {
     // https://developer.spotify.com/documentation/web-api/reference/get-list-users-playlists
     
@@ -113,8 +119,10 @@ struct SpotifyPlaylist: Decodable {
                     var album_type: String = ""
                     var total_tracks: Int = 1
                     var images: [ExternalImage] = [ExternalImage()]
+                    var href: String = ""
                     var name: String = "Preview Album"
                     var release_date: String = ""
+                    var release_date_precision: String = ""
                 }
                 
                 struct Artist: Decodable {
@@ -133,7 +141,7 @@ struct SpotifyPlaylist: Decodable {
                 var disc_number: Int = 0
                 var duration_ms: Int = 0
                 var explicit: Bool = true
-                var external_ids: SpotifyPlaylist.Tracks.Track.TrackObject.ExternalIDs = SpotifyPlaylist.Tracks.Track.TrackObject.ExternalIDs()
+                var external_ids: ExternalIDs = ExternalIDs()
                 var id: String = "preview_track_object"
                 var name: String = "Preview Track Object"
                 var preview_url: String?
@@ -173,4 +181,3 @@ struct SpotifyPlaylist: Decodable {
     var type: String = ""
     var uri: String = ""
 }
-
