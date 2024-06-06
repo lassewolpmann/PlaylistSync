@@ -41,13 +41,6 @@ struct SpotifyPlaylists: View {
                 }
             }
         }
-        .refreshable {
-            do {
-                playlists = try await spotify.getUserPlaylists()
-            } catch {
-                print(error)
-            }
-        }
     }
 }
 

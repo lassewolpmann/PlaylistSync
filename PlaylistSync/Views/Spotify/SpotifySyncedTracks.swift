@@ -12,7 +12,7 @@ struct SpotifySyncedTracks: View {
     let matchedSongs: MatchedSongs
     
     @State private var selectedSong: Song?
-    @Binding var selectedSongs: [Song]
+    @Binding var selectedSongs: [Song?]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -85,6 +85,7 @@ struct SpotifySyncedTracks: View {
             }
         }
         .onAppear {
+            // Set first matched song as selected song
             if let firstSong = matchedSongs.musicKitSongs.first {
                 if (selectedSong == nil) {
                     selectedSong = firstSong.song
