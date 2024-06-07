@@ -53,7 +53,7 @@ struct SpotifySyncSheet: View {
                         Text("Matched \(matchedPlaylist.count) out of \(spotifyPlaylistItems.count)")
                     }
                     
-                    Text("Estimated time remaining: \(Int(eta)) \(Int(eta) == 1 ? "second" : "seconds")")
+                    Text("Estimated time remaining: \(Date().addingTimeInterval(eta), style: .relative)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

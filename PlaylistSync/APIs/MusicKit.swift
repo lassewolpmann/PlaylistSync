@@ -125,9 +125,12 @@ class MusicKitController {
         
         // Create feature print for Spotify Artwork
         var spotifyFeaturePrint: VNFeaturePrintObservation?
-        if let spotifyAlbumCover = spotifyTrack.album.images.first {
-            guard let spotifyAlbumCoverURL = URL(string: spotifyAlbumCover.url) else { throw MusicKitError.artworkError("Could not get URL for Spotify Album Artwork") }
-            spotifyFeaturePrint = featurePrintForImage(imageURL: spotifyAlbumCoverURL)
+        if (advancedMatching) {
+            if let spotifyAlbumCover = spotifyTrack.album.images.first {
+                guard let spotifyAlbumCoverURL = URL(string: spotifyAlbumCover.url) else { throw MusicKitError.artworkError("Could not get URL for Spotify Album Artwork") }
+                spotifyFeaturePrint = featurePrintForImage(imageURL: spotifyAlbumCoverURL)
+            }
+            
         }
         
         do {
