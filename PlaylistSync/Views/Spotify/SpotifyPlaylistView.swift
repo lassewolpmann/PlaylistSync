@@ -30,19 +30,28 @@ struct SpotifyPlaylistView: View {
                 List {
                     Section {
                         HStack(spacing: 15) {
-                            Slider(
-                                value: $matchingLimit,
-                                in: 5...25,
-                                step: 1
-                            ) {
-                                Text("Songs to search when syncing")
-                            } minimumValueLabel: {
-                                Text("5")
-                            } maximumValueLabel: {
-                                Text("25")
+                            VStack(alignment: .leading) {
+                                Slider(
+                                    value: $matchingLimit,
+                                    in: 5...25,
+                                    step: 1
+                                ) {
+                                    Text("Songs to search when syncing")
+                                } minimumValueLabel: {
+                                    Text("5")
+                                } maximumValueLabel: {
+                                    Text("25")
+                                }
+                                .foregroundStyle(.secondary)
+                                .font(.subheadline)
+                                
+                                Label {
+                                    Text("Current Matching Limit: \(Int(matchingLimit))")
+                                } icon: {
+                                    Image(systemName: "magnifyingglass.circle")
+                                        .foregroundStyle(.green)
+                                }
                             }
-                            .foregroundStyle(.secondary)
-                            .font(.subheadline)
                             
                             Button {
                                 showSliderInfo.toggle()
@@ -50,6 +59,8 @@ struct SpotifyPlaylistView: View {
                                 Image(systemName: "questionmark.circle")
                             }
                         }
+                        
+                        
                         
                         HStack(spacing: 15) {
                             Toggle(isOn: $useAdvancedMatching) {
@@ -72,12 +83,17 @@ struct SpotifyPlaylistView: View {
                     }
                     .sheet(isPresented: $showSliderInfo, content: {
                         VStack(alignment: .leading, spacing: 15) {
-                            Text("Matching Limit")
-                                .font(.title)
+                            Label {
+                                Text("Matching Limit")
+                                    .font(.title)
+                            } icon: {
+                                Image(systemName: "magnifyingglass.circle")
+                                    .foregroundStyle(.green)
+                            }
                             
                             Text("This settings changes the amount of songs the App searches for when trying to match the Playlist.")
-                            Text("Increasing this value might return better results but also increases the amount of time the matching process will take.")
-                            Text("Higher limits work better with faster network connections.").bold()
+                            Text("Increasing this value does not have a big effect on the time it requires to do the search.")
+                            Text("It does have a big impact though, if used together with Advanced Sync.").bold()
                         }
                         .padding()
                     })

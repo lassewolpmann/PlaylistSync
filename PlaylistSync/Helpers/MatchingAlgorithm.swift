@@ -9,7 +9,7 @@ import Foundation
 import MusicKit
 import Vision
 
-func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject, musicKitTrack: Song, advancedMatching: Bool) -> Int {
+func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject, musicKitTrack: Song, advancedMatching: Bool, spotifyFeaturePrint: VNFeaturePrintObservation?) -> Int {
     var confidence = 0
 
     if (spotifyTrack.name == musicKitTrack.title) { confidence += 1 }
@@ -59,19 +59,17 @@ func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject,
 
     // Thanks to this article: https://medium.com/@MWM.io/apples-vision-framework-exploring-advanced-image-similarity-techniques-f7bb7d008763
     if (advancedMatching) {
-        print("Using advanced Matching")
         if let spotifyAlbumCover = spotifyTrack.album.images.first {
             guard let height = spotifyAlbumCover.height else { return confidence }
             guard let width = spotifyAlbumCover.width else { return confidence }
             
             guard let musicKitAlbumCoverURL = musicKitTrack.artwork?.url(width: height, height: width) else { return confidence }
-            guard let spotifyAlbumCoverURL = URL(string: spotifyAlbumCover.url) else { return confidence }
             
-            if let featurePrint1 = featurePrintForImage(imageURL: musicKitAlbumCoverURL), let featurePrint2 = featurePrintForImage(imageURL: spotifyAlbumCoverURL) {
+            if let musicKitFeaturePrint = featurePrintForImage(imageURL: musicKitAlbumCoverURL), let spotifyFeaturePrint {
                 var distance: Float = 0
-                try? featurePrint1.computeDistance(&distance, to: featurePrint2)
+                try? spotifyFeaturePrint.computeDistance(&distance, to: musicKitFeaturePrint)
                 
-                if (distance < 0.5) { confidence += 9 }
+                if (distance < 0.4) { confidence += 9 }
             }
         }
     }

@@ -7,10 +7,12 @@
 
 import Foundation
 import MusicKit
+import Vision
 
 enum MusicKitError: Error {
     case matchingError(String)
     case resourceError(String)
+    case artworkError(String)
 }
 
 struct MatchedSong: Hashable {
@@ -121,12 +123,19 @@ class MusicKitController {
         var request = MusicCatalogSearchRequest(term: "\(name) \(artist)", types: [Song.self])
         request.limit = Int(limit)
         
+        // Create feature print for Spotify Artwork
+        var spotifyFeaturePrint: VNFeaturePrintObservation?
+        if let spotifyAlbumCover = spotifyTrack.album.images.first {
+            guard let spotifyAlbumCoverURL = URL(string: spotifyAlbumCover.url) else { throw MusicKitError.artworkError("Could not get URL for Spotify Album Artwork") }
+            spotifyFeaturePrint = featurePrintForImage(imageURL: spotifyAlbumCoverURL)
+        }
+        
         do {
             let result = try await request.response()
             
             let songs = result.songs
             let matchedSongs = songs.map { song in
-                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song, advancedMatching: advancedMatching)
+                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song, advancedMatching: advancedMatching, spotifyFeaturePrint: spotifyFeaturePrint)
                 return MatchedSong(song: song, confidence: confidence)
             }.sorted(by: { a, b in
                 a.confidence > b.confidence
