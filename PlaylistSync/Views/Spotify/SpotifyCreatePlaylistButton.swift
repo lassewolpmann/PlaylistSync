@@ -14,14 +14,17 @@ struct SpotifyCreatePlaylistButton: View {
     let playlistName: String
     let selectedSongs: [Song?]
     
-    @State private var showAlert: Bool = false
-    @State private var playlistCreationMessage: String = ""
-    
+    @State private var showAlert = false
+    @State private var playlistCreationMessage = ""
+    @State private var existingPlaylist = false
+
     @Binding var creatingPlaylist: Bool
     
     var body: some View {
         Button {
             creatingPlaylist = true
+            
+            // TODO: Update playlist if it exists already. Method is already created in musicKit Class
             Task {
                 playlistCreationMessage = await musicKit.createPlaylist(playlistName: playlistName, songs: selectedSongs)
                 creatingPlaylist = false
@@ -29,13 +32,17 @@ struct SpotifyCreatePlaylistButton: View {
             }
         } label: {
             Label {
-                Text("Add synced Playlist to Apple Music")
-                    .fontWeight(.bold)
+                if (existingPlaylist) {
+                    Text("Update Playlist in Apple Music")
+                } else {
+                    Text("Add Playlist to Apple Music")
+                }
             } icon: {
                 Image("AppleMusicIcon")
                     .resizable()
                     .scaledToFit()
             }
+            .fontWeight(.bold)
         }
         .frame(height: 25)
         .padding(.top, 10)
@@ -45,6 +52,15 @@ struct SpotifyCreatePlaylistButton: View {
             isPresented: $showAlert
         ) {
             Button("OK") { showAlert.toggle() }
+        }
+        .task {
+            do {
+                let request = MusicLibrarySearchRequest(term: playlistName, types: [Playlist.self])
+                let existingPlaylistsWithSameName = try await request.response()
+                if (existingPlaylistsWithSameName.playlists.count > 0) { existingPlaylist = true }
+            } catch {
+                print(error)
+            }
         }
     }
 }

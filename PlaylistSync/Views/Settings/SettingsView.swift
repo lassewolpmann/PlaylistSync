@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(SpotifyController.self) private var spotify
-    @Environment(MusicKitController.self) private var musicKit
+    @Bindable var spotifyController: SpotifyController
+    @Bindable var musicKitController: MusicKitController
+    
+    @State private var spotifyAuthInProgress = false
+    @State private var musicKitAuthInProgress = false
     
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
-    
-    @State var spotifyAuth: Bool = false
-    @State var musicKitAuth: Bool = false
     
     var body: some View {
         NavigationStack {
             List {
                 Section {
-                    Toggle(isOn: $spotifyAuth) {
+                    Toggle(isOn: $spotifyAuthInProgress) {
                         Label {
                             Text("Spotify")
                         } icon: {
@@ -30,7 +30,7 @@ struct SettingsView: View {
                         }
                     }
                     
-                    Toggle(isOn: $musicKitAuth) {
+                    Toggle(isOn: $musicKitAuthInProgress) {
                         Label {
                             Text("Apple Music")
                         } icon: {
@@ -41,35 +41,34 @@ struct SettingsView: View {
                         
                     }
                 }
-                .onAppear {
-                    spotifyAuth = spotify.authSuccess
-                    musicKitAuth = musicKit.authSuccess
-                }
-                .onChange(of: spotifyAuth) { oldValue, newValue in
+                .onChange(of: spotifyAuthInProgress) { oldValue, newValue in
                     if (newValue == true) {
                         Task {
-                            let url = try spotify.generateRequestURL()
-                            let urlWithCode = try await webAuthenticationSession.authenticate(using: url!, callbackURLScheme: "playlistsync")
-                            
-                            try await spotify.exchangeCodeForToken(urlWithCode: urlWithCode)                            
+                            if let url = try spotifyController.generateRequestURL() {
+                                do {
+                                    let urlWithCode = try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: "playlistsync")
+                                    try await spotifyController.exchangeCodeForToken(urlWithCode: urlWithCode)
+                                } catch {
+                                    spotifyController.revokeToken()
+                                    spotifyAuthInProgress = false
+                                }
+                            } else {
+                                spotifyController.revokeToken()
+                                spotifyAuthInProgress = false
+                            }
                         }
                     } else {
-                        spotify.revokeToken()
+                        spotifyController.revokeToken()
                     }
                 }
-                .onChange(of: musicKitAuth) { oldValue, newValue in
+                .onChange(of: musicKitAuthInProgress) { oldValue, newValue in
                     if (newValue == true) {
                         Task {
-                            let _ = await musicKit.authorize();
+                            let _ = await musicKitController.authorize();
                         }
                     } else {
-                        musicKit.authSuccess = false
-                        print("Revoke MusicKit auth")
+                        musicKitController.authSuccess = false
                     }
-                }
-                
-                Section {
-                    
                 }
             }
             .navigationTitle("Authorization")
@@ -78,7 +77,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
-        .environment(SpotifyController())
-        .environment(MusicKitController())
+    SettingsView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
 }

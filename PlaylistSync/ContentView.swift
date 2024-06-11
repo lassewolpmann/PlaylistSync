@@ -8,35 +8,32 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var spotify = SpotifyController()
-    @State private var musicKit = MusicKitController()
+    var spotifyController: SpotifyController
+    var musicKitController: MusicKitController
     
     var body: some View {
-        if (spotify.authSuccess == false || musicKit.authSuccess == false) {
-            SettingsView()
-                .environment(spotify)
-                .environment(musicKit)
+        if (spotifyController.authSuccess == false || musicKitController.authSuccess == false) {
+            SettingsView(spotifyController: spotifyController, musicKitController: musicKitController)
         } else {
+            Text("Test")
             
+            /*
             TabView {
                 SpotifyView()
                     .tabItem {
                         Label("Spotify", systemImage: "music.note")
                     }
-                    .environment(spotify)
-                    .environment(musicKit)
                 
                 MusicKitView()
                     .tabItem {
                         Label("Apple Music", systemImage: "music.note")
                     }
-                    .environment(spotify)
-                    .environment(musicKit)
             }
+             */
         }
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
 }

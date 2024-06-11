@@ -21,8 +21,7 @@ enum SpotifyError: Error {
     case urlError(String)
 }
 
-@Observable
-final class SpotifyController {
+@Observable class SpotifyController {
     let clientID = "38171166fd9845f1846a9fa3bea2e925"
     let redirectURI = "playlistsync://com.lassewolpmann.PlaylistSync"
     

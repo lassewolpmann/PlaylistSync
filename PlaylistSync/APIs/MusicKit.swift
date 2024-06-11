@@ -35,8 +35,7 @@ struct MatchedSongs: Hashable {
     var maxConfidencePct: Double = 0.0
 }
 
-@Observable
-class MusicKitController {
+@Observable class MusicKitController {
     var authSuccess: Bool = false
     
     func authorize() async -> Void {
@@ -156,23 +155,24 @@ class MusicKitController {
     }
     
     func createPlaylist(playlistName: String, songs: [Song?]) async -> String {
-        let request = MusicLibrarySearchRequest(term: playlistName, types: [Playlist.self])
-        
-        do {
-            let existingPlaylistsWithSameName = try await request.response()
-            if (existingPlaylistsWithSameName.playlists.count > 0) { return "Playlist with same name exists already." }
-        } catch {
-            return "Could not check for existing Playlists in Apple Music Library: \(error.localizedDescription)."
-        }
-        
         do {
             let library = MusicLibrary.shared
-
             try await library.createPlaylist(name: playlistName, description: "Created by PlaylistSync", items: songs.compactMap { $0 }) // This removes all nil values
             
             return "Successfully created Playlist in your Library."
         } catch {
             return "Could not create Playlist: \(error.localizedDescription)."
+        }
+    }
+    
+    func updatedPlaylist(playlist: Playlist, songs: [Song?]) async -> String {
+        do {
+            let library = MusicLibrary.shared
+            try await library.edit(playlist, items: songs.compactMap { $0 })
+            
+            return "Successfully updated Playlist."
+        } catch {
+            return "Could not update Playlist: \(error.localizedDescription)."
         }
     }
 }
