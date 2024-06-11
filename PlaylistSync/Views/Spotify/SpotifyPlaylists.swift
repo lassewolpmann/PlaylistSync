@@ -8,34 +8,26 @@
 import SwiftUI
 
 struct SpotifyPlaylists: View {
-    @Environment(SpotifyController.self) private var spotify
+    @Bindable var spotifyController: SpotifyController
     @State var playlists: UserPlaylists?
 
     var body: some View {
-        Group {
-            if let playlists {
-                List(playlists.items, id: \.self) { playlist in
-                    NavigationLink {
-                        SpotifyPlaylistView(playlistID: playlist.id)
-                            .environment(spotify)
-                    } label: {
-                        ItemLabel(
-                            name: playlist.name,
-                            author: playlist.owner.display_name ?? "",
-                            imageURL: playlist.images.first?.url ?? ""
-                        )
-                    }
-                }
-            } else {
-                Text("No Playlists found")
-                    .font(.title)
-                    .bold()
+        if let playlists {
+            List(playlists.items, id: \.self, selection: $spotifyController.playlistToSync) { playlist in
+                ItemLabel(
+                    name: playlist.name,
+                    author: playlist.owner.display_name ?? "",
+                    imageURL: playlist.images.first?.url ?? ""
+                )
             }
-        }
-        .task {
-            if (playlists == nil) {
+            .navigationTitle("Your Spotify Playlists")
+        } else {
+            ProgressView {
+                Text("Loading your Spotify Playlists...")
+            }
+            .task {
                 do {
-                    playlists = try await spotify.getUserPlaylists()
+                    playlists = try await spotifyController.getUserPlaylists()
                 } catch {
                     print(error)
                 }
@@ -46,8 +38,7 @@ struct SpotifyPlaylists: View {
 
 #Preview {
     NavigationStack {
-        SpotifyPlaylists(playlists: UserPlaylists())
-            .environment(SpotifyController())
+        SpotifyPlaylists(spotifyController: SpotifyController(), playlists: UserPlaylists())
             .navigationTitle("Spotify")
     }
 }

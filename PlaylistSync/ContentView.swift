@@ -12,28 +12,26 @@ struct ContentView: View {
     var musicKitController: MusicKitController
     
     var body: some View {
-        if (spotifyController.authSuccess == false || musicKitController.authSuccess == false) {
-            SettingsView(spotifyController: spotifyController, musicKitController: musicKitController)
-        } else {
-            Text("Test")
-            
-            /*
-            TabView {
-                SpotifyView()
-                    .tabItem {
-                        Label("Spotify", systemImage: "music.note")
-                    }
-                
-                MusicKitView()
-                    .tabItem {
-                        Label("Apple Music", systemImage: "music.note")
-                    }
+        TabView {
+            SyncView(spotifyController: spotifyController, musicKitController: musicKitController)
+            .tabItem {
+                Label("Sync", systemImage: "arrow.triangle.2.circlepath")
             }
-             */
+            
+            SettingsView(spotifyController: spotifyController, musicKitController: musicKitController)
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
         }
     }
 }
 
 #Preview {
-    ContentView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
+    let spotifyController = SpotifyController()
+    let musicKitController = MusicKitController()
+    
+    spotifyController.authSuccess = true
+    musicKitController.authSuccess = true
+    
+    return ContentView(spotifyController: spotifyController, musicKitController: musicKitController)
 }

@@ -18,8 +18,7 @@ struct MusicKitView: View {
         NavigationStack {
             Group {
                 if (musicKit.authSuccess) {
-                    MusicKitPlaylists()
-                        .environment(musicKit)
+                    MusicKitPlaylists(musicKitController: musicKit)
                 } else {
                     Text("Authorize MusicKit in Settings.")
                 }

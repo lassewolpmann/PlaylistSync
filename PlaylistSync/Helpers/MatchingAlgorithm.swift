@@ -95,3 +95,23 @@ func featurePrintForImage(imageURL: URL) -> VNFeaturePrintObservation? {
         return nil
     }
 }
+
+struct MatchedSong: Hashable {
+    var song: Song
+    var confidence: Int
+}
+
+struct MatchedSongs: Hashable {
+    static func == (lhs: MatchedSongs, rhs: MatchedSongs) -> Bool {
+        return lhs.spotifySong.id == rhs.spotifySong.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(spotifySong.id)
+    }
+    
+    var musicKitSongs: [MatchedSong] = []
+    var spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject
+    var maxConfidence: Int = 0
+    var maxConfidencePct: Double = 0.0
+}

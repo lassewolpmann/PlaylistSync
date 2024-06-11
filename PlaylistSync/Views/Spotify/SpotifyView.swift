@@ -16,8 +16,7 @@ struct SpotifyView: View {
         NavigationStack {
             Group {
                 if (spotify.authSuccess) {
-                    SpotifyPlaylists()
-                        .environment(spotify)
+                    SpotifyPlaylists(spotifyController: spotify)
                 } else {
                     Text("Authorize Spotify in Settings.")
                 }

@@ -11,16 +11,6 @@ import AuthenticationServices
 
 // TODO: Refreshing token
 
-enum SpotifyError: Error {
-    case digestError(String)
-    case challengeError(String)
-    case verifierError(String)
-    case stateError(String)
-    case authError(String)
-    case dataError(String)
-    case urlError(String)
-}
-
 @Observable class SpotifyController {
     let clientID = "38171166fd9845f1846a9fa3bea2e925"
     let redirectURI = "playlistsync://com.lassewolpmann.PlaylistSync"
@@ -33,6 +23,8 @@ enum SpotifyError: Error {
     var authData: AuthData? = nil
     
     var tokenRefreshDate: Date = Date()
+    
+    var playlistToSync: UserPlaylists.Playlist?
     
     init() {
         codeVerifier = self.generateRandomString(length: 64)

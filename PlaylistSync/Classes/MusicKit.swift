@@ -9,34 +9,9 @@ import Foundation
 import MusicKit
 import Vision
 
-enum MusicKitError: Error {
-    case matchingError(String)
-    case resourceError(String)
-    case artworkError(String)
-}
-
-struct MatchedSong: Hashable {
-    var song: Song
-    var confidence: Int
-}
-
-struct MatchedSongs: Hashable {
-    static func == (lhs: MatchedSongs, rhs: MatchedSongs) -> Bool {
-        return lhs.spotifySong.id == rhs.spotifySong.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(spotifySong.id)
-    }
-    
-    var musicKitSongs: [MatchedSong] = []
-    var spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject
-    var maxConfidence: Int = 0
-    var maxConfidencePct: Double = 0.0
-}
-
 @Observable class MusicKitController {
     var authSuccess: Bool = false
+    var playlistToSync: Playlist?
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()

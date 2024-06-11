@@ -9,39 +9,30 @@ import SwiftUI
 import MusicKit
 
 struct MusicKitPlaylists: View {
-    @Environment(MusicKitController.self) private var musicKit
+    @Bindable var musicKitController: MusicKitController
     @State private var playlists: MusicItemCollection<Playlist>?
     
     var body: some View {
-        List {
-            if (playlists != nil) {
-                ForEach(playlists ?? [], id: \.id) { playlist in
-                    NavigationLink {
-                        MusicKitPlaylistView(playlist: playlist)
-                    } label: {
-                        ItemLabel(
-                            name: playlist.name,
-                            author: playlist.curatorName ?? "",
-                            imageURL: playlist.artwork?.url(width: 50, height: 50)?.absoluteString ?? ""
-                        )
-                    }
-                }
-            } else {
-                Text("Loading...")
+        if let playlists {
+            List(playlists, id: \.self, selection: $musicKitController.playlistToSync) { playlist in
+                ItemLabel(
+                    name: playlist.name,
+                    author: playlist.curatorName ?? "",
+                    imageURL: playlist.artwork?.url(width: 50, height: 50)?.absoluteString ?? ""
+                )
             }
-        }
-        .task {
-            if (playlists == nil) {
-                playlists = await musicKit.getUserPlaylists()
+            .navigationTitle("Your Apple Music Playlists")
+        } else {
+            ProgressView {
+                Text("Loading your Apple Music Playlists...")
             }
-        }
-        .refreshable {
-            playlists = await musicKit.getUserPlaylists()
+            .task {
+                playlists = await musicKitController.getUserPlaylists()
+            }
         }
     }
 }
 
 #Preview {
-    MusicKitPlaylists()
-        .environment(MusicKitController())
+    MusicKitPlaylists(musicKitController: MusicKitController())
 }
