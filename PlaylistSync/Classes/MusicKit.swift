@@ -150,4 +150,25 @@ import Vision
             return "Could not update Playlist: \(error.localizedDescription)."
         }
     }
+    
+    func createCommonData() async throws -> [CommonSongData] {
+        if let playlist = await self.getPlaylist(playlist: self.playlistToSync) {
+            print(playlist.description)
+            if let items = playlist.tracks {
+                let commonSongData = items.map { item in
+                    let duration_in_ms = Int(item.duration ?? 0) * 1000
+                    let album = item.albums?.first
+                    let album_artwork = album?.artwork?.url(width: 640, height: 640)
+                    
+                    return CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: album?.releaseDate, album_artwork_cover: album_artwork, album_artwork_width: 640, album_artwork_height: 640)
+                }
+                
+                return commonSongData
+            } else {
+                throw MusicKitError.resourceError("Could not create Common Data")
+            }
+        } else {
+            throw MusicKitError.resourceError("Could not create Common Data")
+        }
+    }
 }

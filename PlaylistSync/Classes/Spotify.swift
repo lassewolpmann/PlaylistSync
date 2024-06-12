@@ -219,6 +219,44 @@ import AuthenticationServices
         return tracks
     }
     
+    func createCommonData() async throws -> [CommonSongData] {
+        if let playlist = self.playlistToSync {
+            let items = try await self.getPlaylistItems(url: playlist.tracks.href, total: playlist.tracks.total)
+            let commonSongData = items.map { item in
+                let name = item.name
+                let disc_number = item.disc_number
+                let track_number = item.track_number
+                let artist = item.artists.first?.name ?? "Unknown Artist"
+                let isrc = item.external_ids.isrc ?? "Unknown ISRC"
+                let duration_ms = item.duration_ms
+                let album = item.album
+                
+                // Spotify has different precisions for the album release date. Therefore I need to check the precision first before setting the right format for the date formatter.
+                let formatter = DateFormatter()
+                
+                if (album.release_date_precision == "year") {
+                    formatter.dateFormat = "yyyy"
+                } else if (album.release_date_precision == "month") {
+                    formatter.dateFormat = "yyyy-MM"
+                } else if (album.release_date_precision == "day") {
+                    formatter.dateFormat = "yyyy-MM-dd"
+                }
+                
+                formatter.timeZone = TimeZone(abbreviation: "UTC")
+                let date = formatter.date(from: album.release_date)
+                
+                let artwork_cover = item.album.images.first
+                let artwork_cover_url = URL(string: artwork_cover?.url ?? "")
+                
+                return CommonSongData(name: name, disc_number: disc_number, track_number: track_number, artist_name: artist, isrc: isrc, duration_in_ms: duration_ms, album_name: album.name, album_release_date: date, album_artwork_cover: artwork_cover_url, album_artwork_width: artwork_cover?.width, album_artwork_height: artwork_cover?.height)
+            }
+            
+            return commonSongData
+        } else {
+            throw SpotifyError.dataError("Could not create Common Data")
+        }
+    }
+    
     func revokeToken() -> Void {
         self.authData = nil
         self.authSuccess = false

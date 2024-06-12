@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SettingsView: View {
+struct SettingsTabView: View {
     @Bindable var spotifyController: SpotifyController
     @Bindable var musicKitController: MusicKitController
     
@@ -77,5 +77,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
+    SettingsTabView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
 }

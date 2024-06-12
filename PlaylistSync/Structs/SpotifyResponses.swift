@@ -166,10 +166,6 @@ struct SpotifyPlaylist: Decodable {
         var items: [SpotifyPlaylist.Tracks.Track] = [SpotifyPlaylist.Tracks.Track()]
     }
     
-    var collaborative: Bool = false
-    var description: String = "Preview Spotify Playlist"
-    var external_urls: ExternalURLs = ExternalURLs()
-    var followers: Followers = Followers()
     var href: String = ""
     var id: String = "preview_spotify_playlist"
     var images: [ExternalImage] = [ExternalImage()]

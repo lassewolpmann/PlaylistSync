@@ -13,12 +13,12 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            SyncView(spotifyController: spotifyController, musicKitController: musicKitController)
+            SyncTabView(spotifyController: spotifyController, musicKitController: musicKitController)
             .tabItem {
                 Label("Sync", systemImage: "arrow.triangle.2.circlepath")
             }
             
-            SettingsView(spotifyController: spotifyController, musicKitController: musicKitController)
+            SettingsTabView(spotifyController: spotifyController, musicKitController: musicKitController)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
