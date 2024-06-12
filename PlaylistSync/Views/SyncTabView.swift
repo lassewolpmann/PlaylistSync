@@ -25,6 +25,8 @@ struct SyncTabView: View {
     
     @State var showSyncSheet = false
     
+    @State var commonSongData: [CommonSongData] = []
+    
     var body: some View {
         NavigationStack {
             List {
@@ -39,19 +41,18 @@ struct SyncTabView: View {
                         Text("Loading data...")
                     }
                 } else {
-                    List {
+                    List(commonSongData, id: \.self) { song in
+                        ItemLabel(name: song.name, author: song.artist_name, imageURL: song.album_artwork_cover?.absoluteString ?? "")
+                    }
+                    .onAppear {
                         switch selectedSource {
                         case .spotify:
                             if let items = spotifyController.commonSongData {
-                                ForEach(items, id: \.self) { item in
-                                    ItemLabel(name: item.name, author: item.artist_name, imageURL: item.album_artwork_cover?.absoluteString ?? "")
-                                }
+                                commonSongData = items
                             }
                         case .appleMusic:
                             if let items = musicKitController.commonSongData {
-                                ForEach(items, id: \.self) { item in
-                                    ItemLabel(name: item.name, author: item.artist_name, imageURL: item.album_artwork_cover?.absoluteString ?? "")
-                                }
+                                commonSongData = items
                             }
                         }
                     }
