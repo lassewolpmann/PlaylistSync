@@ -25,6 +25,8 @@ import AuthenticationServices
     var tokenRefreshDate: Date = Date()
     
     var playlistToSync: UserPlaylists.Playlist?
+    var commonSongData: [CommonSongData]?
+    var loadingCommonData = false
     
     init() {
         codeVerifier = self.generateRandomString(length: 64)
@@ -219,7 +221,7 @@ import AuthenticationServices
         return tracks
     }
     
-    func createCommonData() async throws -> [CommonSongData] {
+    func createCommonData() async throws -> Void {
         if let playlist = self.playlistToSync {
             let items = try await self.getPlaylistItems(url: playlist.tracks.href, total: playlist.tracks.total)
             let commonSongData = items.map { item in
@@ -251,9 +253,9 @@ import AuthenticationServices
                 return CommonSongData(name: name, disc_number: disc_number, track_number: track_number, artist_name: artist, isrc: isrc, duration_in_ms: duration_ms, album_name: album.name, album_release_date: date, album_artwork_cover: artwork_cover_url, album_artwork_width: artwork_cover?.width, album_artwork_height: artwork_cover?.height)
             }
             
-            return commonSongData
+            self.commonSongData = commonSongData
         } else {
-            throw SpotifyError.dataError("Could not create Common Data")
+            throw SpotifyError.dataError("Could not create common Data.")
         }
     }
     

@@ -14,6 +14,8 @@ struct SyncView: View {
     var selectedSource: Service
     var selectedTarget: Service
     
+    @Binding var showSyncSheet: Bool
+    
     var body: some View {
         Section {
             switch selectedSource {
@@ -35,29 +37,33 @@ struct SyncView: View {
                 }
             }
             
-            NavigationLink {
+            Button {
                 switch selectedSource {
                 case .spotify:
+                    spotifyController.loadingCommonData = true
                     // Gather Spotify Playlist data
-                    Text("Syncing from Spotify")
-                        .task {
-                            do {
-                                let items = try await spotifyController.createCommonData()
-                            } catch {
-                                print(error)
-                            }
+                    Task {
+                        do {
+                            try await spotifyController.createCommonData()
+                            spotifyController.loadingCommonData = false
+                        } catch {
+                            print(error)
                         }
+                    }
                 case .appleMusic:
+                    musicKitController.loadingCommonData = true
                     // Gather Apple Music Playlist data
-                    Text("Syncing from Apple Music")
-                        .task {
-                            do {
-                                let items = try await musicKitController.createCommonData()
-                            } catch {
-                                print(error)
-                            }
+                    Task {
+                        do {
+                            try await musicKitController.createCommonData()
+                            musicKitController.loadingCommonData = false
+                        } catch {
+                            print(error)
                         }
+                    }
                 }
+                
+                showSyncSheet.toggle()
             } label: {
                 switch selectedTarget {
                 case .spotify:
@@ -118,6 +124,6 @@ struct SyncView: View {
 
 #Preview {
     List {
-        SyncView(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: Service.spotify, selectedTarget: Service.appleMusic)
+        SyncView(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: Service.spotify, selectedTarget: Service.appleMusic, showSyncSheet: .constant(false))
     }
 }

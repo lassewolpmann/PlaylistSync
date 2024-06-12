@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CommonSongData {
+struct CommonSongData: Hashable {
     var name: String
     var disc_number: Int
     var track_number: Int

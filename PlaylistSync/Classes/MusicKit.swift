@@ -11,7 +11,10 @@ import Vision
 
 @Observable class MusicKitController {
     var authSuccess: Bool = false
+    
     var playlistToSync: Playlist?
+    var commonSongData: [CommonSongData]?
+    var loadingCommonData = false
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
@@ -151,19 +154,31 @@ import Vision
         }
     }
     
-    func createCommonData() async throws -> [CommonSongData] {
+    func createCommonData() async throws -> Void {
         if let playlist = await self.getPlaylist(playlist: self.playlistToSync) {
-            print(playlist.description)
             if let items = playlist.tracks {
-                let commonSongData = items.map { item in
+                var detailedItems: [Song] = []
+                
+                for item in items {
+                    switch item {
+                    case .song(let song):
+                        let detailedSong = try await song.with(.albums)
+                        
+                        detailedItems.append(detailedSong)
+                    case .musicVideo:
+                        print("Ignoring Music Videos")
+                    }
+                }
+                
+                let commonSongData = detailedItems.map { item in
                     let duration_in_ms = Int(item.duration ?? 0) * 1000
                     let album = item.albums?.first
                     let album_artwork = album?.artwork?.url(width: 640, height: 640)
                     
                     return CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: album?.releaseDate, album_artwork_cover: album_artwork, album_artwork_width: 640, album_artwork_height: 640)
                 }
-                
-                return commonSongData
+                                
+                self.commonSongData = commonSongData
             } else {
                 throw MusicKitError.resourceError("Could not create Common Data")
             }
