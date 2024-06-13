@@ -38,31 +38,6 @@ struct SyncButton: View {
             }
             
             Button {
-                switch selectedSource {
-                case .spotify:
-                    spotifyController.loadingCommonData = true
-                    // Gather Spotify Playlist data
-                    Task {
-                        do {
-                            try await spotifyController.createCommonData()
-                            spotifyController.loadingCommonData = false
-                        } catch {
-                            print(error)
-                        }
-                    }
-                case .appleMusic:
-                    musicKitController.loadingCommonData = true
-                    // Gather Apple Music Playlist data
-                    Task {
-                        do {
-                            try await musicKitController.createCommonData()
-                            musicKitController.loadingCommonData = false
-                        } catch {
-                            print(error)
-                        }
-                    }
-                }
-                
                 showSyncSheet.toggle()
             } label: {
                 switch selectedTarget {

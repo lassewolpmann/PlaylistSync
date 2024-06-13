@@ -34,7 +34,7 @@ struct SyncTabView: View {
                 SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget, showSyncSheet: $showSyncSheet)
             }
             .sheet(isPresented: $showSyncSheet, content: {
-                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget)
+                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget, matchingLimit: matchingLimit, useAdvancedMatching: useAdvancedMatching)
             })
             .navigationTitle("Sync")
         }

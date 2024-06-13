@@ -2,7 +2,7 @@
 //  MusicKitPlaylists.swift
 //  PlaylistSync
 //
-//  Created by Lasse Wolpmann on 24.5.2024.
+//  Created by Lasse Wolpmann on 13.6.2024.
 //
 
 import SwiftUI

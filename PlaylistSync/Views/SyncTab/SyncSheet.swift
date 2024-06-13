@@ -14,34 +14,131 @@ struct SyncSheet: View {
     var selectedSource: Service
     var selectedTarget: Service
     
-    @State var commonSongData: [CommonSongData] = []
+    var matchingLimit: Double
+    var useAdvancedMatching: Bool
+    
+    @State var loadingItems = true
+    @State var matchingItems = true
+    
+    @State var sourceData: [CommonSongData] = []
+    @State var matchedData: [MatchedSongs] = []
+    
     @State var playlistName: String = ""
     
     var body: some View {
         NavigationStack {
-            if (spotifyController.loadingCommonData || musicKitController.loadingCommonData) {
-                ProgressView {
-                    Text("Loading data...")
-                }
-            } else {
-                List(commonSongData, id: \.self) { song in
-                    ItemLabel(name: song.name, author: song.artist_name, imageURL: song.album_artwork_cover?.absoluteString ?? "")
-                }
-                .navigationTitle(playlistName)
-                .onAppear {
-                    switch selectedSource {
-                    case .spotify:
-                        playlistName = spotifyController.playlistToSync?.name ?? "Playlist"
-                        if let items = spotifyController.commonSongData {
-                            commonSongData = items
+            if (loadingItems || matchingItems) {
+                List {
+                    Label {
+                        Text("Loading Songs")
+                    } icon: {
+                        if (loadingItems) {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "checkmark.circle")
                         }
-                    case .appleMusic:
-                        playlistName = musicKitController.playlistToSync?.name ?? "Playlist"
-                        if let items = musicKitController.commonSongData {
-                            commonSongData = items
+                    }
+                    
+                    Label {
+                        Text("Matching Songs")
+                    } icon: {
+                        if (matchingItems) {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "checkmark.circle")
                         }
                     }
                 }
+                .task {
+                    do {
+                        sourceData = try await getSourceData()
+                        loadingItems = false
+                        
+                        matchedData = await getMatchedSongs()
+                        matchingItems = false
+                    } catch {
+                        print(error)
+                    }
+                }
+            } else {
+                List(matchedData, id: \.self) { data in
+                    Section {
+                        ItemLabel(name: data.sourceSong.name, author: data.sourceSong.artist_name, imageURL: data.sourceSong.album_artwork_cover?.absoluteString ?? "")
+                        
+                        NavigationLink {
+                            List(data.targetSongs, id: \.self.song) { target in
+                                ItemLabel(name: target.song.name, author: target.song.artist_name, imageURL: target.song.album_artwork_cover?.absoluteString ?? "")
+                            }
+                            .navigationTitle("Alternatives")
+                        } label: {
+                            let firstSong = data.targetSongs.first
+                            let name = firstSong?.song.name ?? ""
+                            let artist = firstSong?.song.artist_name ?? ""
+                            let imageURL = firstSong?.song.album_artwork_cover?.absoluteString ?? ""
+                            
+                            ItemLabel(name: name, author: artist, imageURL: imageURL)
+                        }
+                    } header: {
+                        Text("\((data.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
+                    }
+                    
+                }
+                .navigationTitle(playlistName)
+            }
+        }
+    }
+    
+    func getSourceData() async throws -> [CommonSongData] {
+        print("Getting Source Data")
+        switch selectedSource {
+        case .spotify:
+            playlistName = spotifyController.playlistToSync?.name ?? "Playlist"
+            try await spotifyController.createCommonData()
+            
+            if let items = spotifyController.commonSongData {
+                return items
+            } else {
+                return []
+            }
+        case .appleMusic:
+            playlistName = musicKitController.playlistToSync?.name ?? "Playlist"
+            try await musicKitController.createCommonData()
+            
+            if let items = musicKitController.commonSongData {
+                return items
+            } else {
+                return []
+            }
+        }
+    }
+    
+    func getMatchedSongs() async -> [MatchedSongs] {
+        switch selectedTarget {
+        case .spotify:
+            // Search Spotify API
+            print("Search in Spotify")
+            
+            return []
+        case .appleMusic:
+            // Search MusicKit
+            print("Search in Apple Music")
+            do {
+                var data: [MatchedSongs] = []
+                
+                for item in sourceData {
+                    let matchedItem = try await musicKitController.matchSong(searchObject: item, searchLimit: matchingLimit, useAdvancedMatching: useAdvancedMatching)
+                    data.append(matchedItem)
+                }
+                
+                data = data.sorted(by: { a, b in
+                    return a.maxConfidence < b.maxConfidence
+                })
+                
+                return data
+            } catch {
+                print(error)
+                
+                return []
             }
         }
     }
@@ -57,6 +154,6 @@ struct SyncSheet: View {
     return VStack {
         Text("Preview")
     }.sheet(isPresented: .constant(true)) {
-        SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: Service.spotify, selectedTarget: Service.appleMusic)
+        SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: Service.spotify, selectedTarget: Service.appleMusic, matchingLimit: 5.0, useAdvancedMatching: true)
     }
 }

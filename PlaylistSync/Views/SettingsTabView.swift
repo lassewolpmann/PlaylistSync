@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct SettingsTabView: View {
     @Bindable var spotifyController: SpotifyController
@@ -15,7 +16,7 @@ struct SettingsTabView: View {
     @State private var musicKitAuthInProgress = false
     
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
-    
+
     var body: some View {
         NavigationStack {
             List {

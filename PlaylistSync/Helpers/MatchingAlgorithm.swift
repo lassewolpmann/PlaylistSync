@@ -9,47 +9,24 @@ import Foundation
 import MusicKit
 import Vision
 
-func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject, musicKitTrack: Song, advancedMatching: Bool, spotifyFeaturePrint: VNFeaturePrintObservation?) -> Int {
+func calculateConfidence(sourceData: CommonSongData, targetData: CommonSongData, useAdvancedMatching: Bool, sourceFeaturePrint: VNFeaturePrintObservation?) -> Int {
     var confidence = 0
-
-    if (spotifyTrack.name == musicKitTrack.title) { confidence += 1 }
     
-    if (spotifyTrack.disc_number == musicKitTrack.discNumber) { confidence += 2 }
+    if (sourceData.name == targetData.name) { confidence += 1 }
     
-    if (spotifyTrack.track_number == musicKitTrack.trackNumber) { confidence += 3 }
+    if (sourceData.disc_number == targetData.disc_number) { confidence += 2 }
     
-    if (spotifyTrack.album.name == musicKitTrack.albumTitle) { confidence += 4 }
+    if (sourceData.track_number == targetData.track_number) { confidence += 3 }
     
-    let spotifyArtistName = spotifyTrack.artists.first?.name.lowercased()
-    let musicKitArtistName = musicKitTrack.artistName.lowercased()
-    if (spotifyArtistName == musicKitArtistName) { confidence += 5 }
+    if (sourceData.album_name == targetData.album_name) { confidence += 4 }
+    
+    if (sourceData.artist_name == targetData.artist_name) { confidence += 5 }
      
-    if (spotifyTrack.external_ids.isrc == musicKitTrack.isrc) { confidence += 6 }
+    if (sourceData.isrc == targetData.isrc) { confidence += 6 }
     
-    let spotifySongDuration = floor(Double(spotifyTrack.duration_ms) / 1000)
-    let musicKitSongDuration = floor(musicKitTrack.duration ?? 0.0)
-    if (spotifySongDuration == musicKitSongDuration) { confidence += 7 }
+    if (sourceData.duration_in_ms == targetData.duration_in_ms) { confidence += 7 }
      
-    // Spotify has different precisions for the album release date. Therefore I need to check the precision first before setting the right format for the date formatter.
-    let formatter = DateFormatter()
-    let spotifyReleaseDatePrecision = spotifyTrack.album.release_date_precision
-    
-    if (spotifyReleaseDatePrecision == "year") {
-        formatter.dateFormat = "yyyy"
-    } else if (spotifyReleaseDatePrecision == "month") {
-        formatter.dateFormat = "yyyy-MM"
-    } else if (spotifyReleaseDatePrecision == "day") {
-        formatter.dateFormat = "yyyy-MM-dd"
-    }
-    
-    let spotifyReleaseDate = spotifyTrack.album.release_date
-    let musicKitReleaseDate = musicKitTrack.releaseDate
-    
-    formatter.timeZone = TimeZone(abbreviation: "UTC")
-    
-    if let date = formatter.date(from: spotifyReleaseDate), let musicKitReleaseDate {
-        if (date == musicKitReleaseDate) { confidence += 8 }
-    }
+    if (sourceData.album_release_date == targetData.album_release_date) { confidence += 8 }
     
     /*
     // TODO: Include Shazam Kit
@@ -58,18 +35,15 @@ func calculateConfidence(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject,
      */
 
     // Thanks to this article: https://medium.com/@MWM.io/apples-vision-framework-exploring-advanced-image-similarity-techniques-f7bb7d008763
-    if (advancedMatching) {
-        if let spotifyAlbumCover = spotifyTrack.album.images.first {
-            guard let height = spotifyAlbumCover.height else { return confidence }
-            guard let width = spotifyAlbumCover.width else { return confidence }
-            
-            guard let musicKitAlbumCoverURL = musicKitTrack.artwork?.url(width: height, height: width) else { return confidence }
-            
-            if let musicKitFeaturePrint = featurePrintForImage(imageURL: musicKitAlbumCoverURL), let spotifyFeaturePrint {
-                var distance: Float = 0
-                try? spotifyFeaturePrint.computeDistance(&distance, to: musicKitFeaturePrint)
-                
-                if (distance < 0.4) { confidence += 9 }
+    if (useAdvancedMatching) {
+        if (sourceData.album_artwork_height == targetData.album_artwork_height && sourceData.album_artwork_width == targetData.album_artwork_width) {
+            if let albumURL = targetData.album_artwork_cover {
+                if let targetFeaturePrint = featurePrintForImage(imageURL: albumURL), let sourceFeaturePrint {
+                    var distance: Float = 0
+                    try? sourceFeaturePrint.computeDistance(&distance, to: targetFeaturePrint)
+                    
+                    if (distance < 0.4) { confidence += 9 }
+                }
             }
         }
     }
@@ -96,22 +70,26 @@ func featurePrintForImage(imageURL: URL) -> VNFeaturePrintObservation? {
     }
 }
 
-struct MatchedSong: Hashable {
-    var song: Song
+struct MatchedSong: Hashable, Identifiable {
+    var song: CommonSongData
     var confidence: Int
+    
+    var id: String {
+        song.isrc
+    }
 }
 
 struct MatchedSongs: Hashable {
     static func == (lhs: MatchedSongs, rhs: MatchedSongs) -> Bool {
-        return lhs.spotifySong.id == rhs.spotifySong.id
+        return lhs.sourceSong.isrc == rhs.sourceSong.isrc
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(spotifySong.id)
+        hasher.combine(sourceSong.isrc)
     }
     
-    var musicKitSongs: [MatchedSong] = []
-    var spotifySong: SpotifyPlaylist.Tracks.Track.TrackObject
+    var targetSongs: [MatchedSong] = []
+    var sourceSong: CommonSongData
     var maxConfidence: Int = 0
     var maxConfidencePct: Double = 0.0
 }

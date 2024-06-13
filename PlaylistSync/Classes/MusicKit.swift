@@ -14,7 +14,6 @@ import Vision
     
     var playlistToSync: Playlist?
     var commonSongData: [CommonSongData]?
-    var loadingCommonData = false
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
@@ -50,73 +49,28 @@ import Vision
         }
     }
     
-    func getSong(track: MusicItemCollection<Track>.Element?) async -> Song? {
-        guard let trackTitle = track?.title else {
-            return nil
-        }
+    func matchSong(searchObject: CommonSongData, searchLimit: Double, useAdvancedMatching: Bool) async throws -> MatchedSongs {
+        var request = MusicCatalogSearchRequest(term: "\(searchObject.fixedName) \(searchObject.artist_name)", types: [Song.self])
+        request.limit = Int(searchLimit)
         
-        guard let trackArtist = track?.artistName.lowercased() else {
-            return nil
-        }
-        
-        guard let trackDuration = track?.duration else {
-            return nil
-        }
-        
-        var request = MusicCatalogSearchRequest(term: "\(trackTitle) \(trackArtist)", types: [Song.self])
-        request.limit = 25
-        
-        do {
-            let response = try await request.response()
-            let filtered = response.songs.filter { song in
-                return song.duration == trackDuration && song.artistName.lowercased() == trackArtist
-            }
-            
-            guard let song = filtered.first else {
-                print("Could not find \(trackTitle), by \(trackArtist)", response.debugDescription)
-                
-                return nil
-            }
-            
-            return song
-        } catch {
-            print(error)
-            
-            return nil
-        }
-    }
-    
-    func searchSongWithISRC(spotifyTrack: SpotifyPlaylist.Tracks.Track.TrackObject, limit: Double, advancedMatching: Bool) async throws -> MatchedSongs {
-        // Split name at "-" and "(", since they usually add information that might confuse the Apple Music Search
-        var name = spotifyTrack.name.components(separatedBy: "-").first ?? spotifyTrack.name
-        name = name.components(separatedBy: "(").first ?? name
-        name = name.replacingOccurrences(of: "`", with: "'")
-        name = name.replacingOccurrences(of: "fuck", with: "f**k", options: .caseInsensitive)
-        name = name.trimmingCharacters(in: .whitespaces)
-        
-        // Only taking the first artist should be enough and avoids confusion when listing multiple artists
-        let artist = spotifyTrack.artists.first?.name ?? ""
-                
-        var request = MusicCatalogSearchRequest(term: "\(name) \(artist)", types: [Song.self])
-        request.limit = Int(limit)
-        
-        // Create feature print for Spotify Artwork
-        var spotifyFeaturePrint: VNFeaturePrintObservation?
-        if (advancedMatching) {
-            if let spotifyAlbumCover = spotifyTrack.album.images.first {
-                guard let spotifyAlbumCoverURL = URL(string: spotifyAlbumCover.url) else { throw MusicKitError.artworkError("Could not get URL for Spotify Album Artwork") }
-                spotifyFeaturePrint = featurePrintForImage(imageURL: spotifyAlbumCoverURL)
-            }
-            
+        // Create feature print
+        var sourceFeaturePrint: VNFeaturePrintObservation?
+        if (useAdvancedMatching) {
+            guard let albumCoverURL = searchObject.album_artwork_cover else { throw MusicKitError.artworkError("Could not get URL for Album Artwork") }
+            sourceFeaturePrint = featurePrintForImage(imageURL: albumCoverURL)
         }
         
         do {
             let result = try await request.response()
             
-            let songs = result.songs
-            let matchedSongs = songs.map { song in
-                let confidence = calculateConfidence(spotifyTrack: spotifyTrack, musicKitTrack: song, advancedMatching: advancedMatching, spotifyFeaturePrint: spotifyFeaturePrint)
-                return MatchedSong(song: song, confidence: confidence)
+            let matchedSongs = result.songs.map { item in
+                let duration_in_ms = Int(item.duration ?? 0) * 1000
+                let artwork = item.artwork
+                
+                let commonSong = CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: item.releaseDate, album_artwork_cover: artwork?.url(width: 640, height: 640), album_artwork_width: 640, album_artwork_height: 640)
+                
+                let confidence = calculateConfidence(sourceData: searchObject, targetData: commonSong, useAdvancedMatching: useAdvancedMatching, sourceFeaturePrint: sourceFeaturePrint)
+                return MatchedSong(song: commonSong, confidence: confidence)
             }.sorted(by: { a, b in
                 a.confidence > b.confidence
             })
@@ -124,11 +78,11 @@ import Vision
             guard let maxConfidence = matchedSongs.first?.confidence else { throw MusicKitError.matchingError("Could not match song") }
             
             // 45 is highest possible confidence score
-            let maxConfidencePct = advancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
+            let maxConfidencePct = useAdvancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
             
-            return MatchedSongs(musicKitSongs: matchedSongs, spotifySong: spotifyTrack, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
+            return MatchedSongs(targetSongs: matchedSongs, sourceSong: searchObject, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
-            throw MusicKitError.resourceError("Could not find song \(spotifyTrack.name) \(spotifyTrack.artists.first?.name ?? "")")
+            return MatchedSongs(sourceSong: searchObject)
         }
     }
     

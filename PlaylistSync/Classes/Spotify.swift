@@ -26,7 +26,6 @@ import AuthenticationServices
     
     var playlistToSync: UserPlaylists.Playlist?
     var commonSongData: [CommonSongData]?
-    var loadingCommonData = false
     
     init() {
         codeVerifier = self.generateRandomString(length: 64)
