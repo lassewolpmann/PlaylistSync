@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct StatusView: View {
+struct AuthStatus: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
     
@@ -46,6 +46,6 @@ struct StatusView: View {
 
 #Preview {
     List {
-        StatusView(spotifyController: SpotifyController(), musicKitController: MusicKitController())
+        AuthStatus(spotifyController: SpotifyController(), musicKitController: MusicKitController())
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DataView: View {
+struct SyncData: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
     
@@ -93,6 +93,6 @@ struct DataView: View {
 
 #Preview {
     List {
-        DataView(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: .constant(Service.spotify), selectedTarget: .constant(Service.appleMusic))
+        SyncData(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: .constant(Service.spotify), selectedTarget: .constant(Service.appleMusic))
     }
 }

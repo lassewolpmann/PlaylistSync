@@ -25,38 +25,16 @@ struct SyncTabView: View {
     
     @State var showSyncSheet = false
     
-    @State var commonSongData: [CommonSongData] = []
-    
     var body: some View {
         NavigationStack {
             List {
-                StatusView(spotifyController: spotifyController, musicKitController: musicKitController)
-                DataView(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: $selectedSource, selectedTarget: $selectedTarget)
-                SyncSettingsView(matchingLimit: $matchingLimit, useAdvancedMatching: $useAdvancedMatching)
-                SyncView(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget, showSyncSheet: $showSyncSheet)
+                AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
+                SyncData(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: $selectedSource, selectedTarget: $selectedTarget)
+                SyncSettings(matchingLimit: $matchingLimit, useAdvancedMatching: $useAdvancedMatching)
+                SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget, showSyncSheet: $showSyncSheet)
             }
             .sheet(isPresented: $showSyncSheet, content: {
-                if (spotifyController.loadingCommonData || musicKitController.loadingCommonData) {
-                    ProgressView {
-                        Text("Loading data...")
-                    }
-                } else {
-                    List(commonSongData, id: \.self) { song in
-                        ItemLabel(name: song.name, author: song.artist_name, imageURL: song.album_artwork_cover?.absoluteString ?? "")
-                    }
-                    .onAppear {
-                        switch selectedSource {
-                        case .spotify:
-                            if let items = spotifyController.commonSongData {
-                                commonSongData = items
-                            }
-                        case .appleMusic:
-                            if let items = musicKitController.commonSongData {
-                                commonSongData = items
-                            }
-                        }
-                    }
-                }
+                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: selectedSource, selectedTarget: selectedTarget)
             })
             .navigationTitle("Sync")
         }

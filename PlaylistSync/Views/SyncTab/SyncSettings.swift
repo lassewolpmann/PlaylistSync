@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SyncSettingsView: View {
+struct SyncSettings: View {
     @State var showSliderInfo = false
     @State var showToggleInfo = false
     
@@ -103,6 +103,6 @@ struct SyncSettingsView: View {
 
 #Preview {
     List {
-        SyncSettingsView(matchingLimit: .constant(5.0), useAdvancedMatching: .constant(false))
+        SyncSettings(matchingLimit: .constant(5.0), useAdvancedMatching: .constant(false))
     }
 }

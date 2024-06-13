@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SyncView: View {
+struct SyncButton: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
     
@@ -124,6 +124,6 @@ struct SyncView: View {
 
 #Preview {
     List {
-        SyncView(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: Service.spotify, selectedTarget: Service.appleMusic, showSyncSheet: .constant(false))
+        SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: Service.spotify, selectedTarget: Service.appleMusic, showSyncSheet: .constant(false))
     }
 }
