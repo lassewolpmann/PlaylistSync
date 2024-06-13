@@ -10,135 +10,99 @@ import SwiftUI
 struct SyncSheet: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
+    var syncController: SyncController
     
-    var selectedSource: Service
-    var selectedTarget: Service
-    
-    var matchingLimit: Double
-    var useAdvancedMatching: Bool
-    
-    @State var loadingItems = true
-    @State var matchingItems = true
-    
-    @State var sourceData: [CommonSongData] = []
-    @State var matchedData: [MatchedSongs] = []
-    
-    @State var playlistName: String = ""
+    @State var playlistName = ""
     
     var body: some View {
         NavigationStack {
-            if (loadingItems || matchingItems) {
-                List {
-                    Label {
-                        Text("Loading Songs")
-                    } icon: {
-                        if (loadingItems) {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "checkmark.circle")
+            if let sourceData = syncController.sourceData {
+                if let targetData = syncController.targetData {
+                    switch targetData {
+                    case .spotify(let matchedData):
+                        Text("Spotify")
+                            .navigationTitle(playlistName)
+                    case .appleMusic(let matchedData):
+                        List(matchedData, id: \.sourceData.isrc) { data in
+                            Section {
+                                let sourceArtworkURL = data.sourceData.album_artwork_cover?.absoluteString ?? ""
+                                ItemLabel(name: data.sourceData.name, author: data.sourceData.artist_name, imageURL: sourceArtworkURL)
+                                
+                                if let firstSong = data.matchedData.first?.song {
+                                    NavigationLink {
+                                        List(data.matchedData, id: \.song.self) { data in
+                                            let artworkURL = data.song.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
+                                            ItemLabel(name: data.song.title, author: data.song.artistName, imageURL: artworkURL)
+                                        }
+                                        .navigationTitle("Alternatives")
+                                    } label: {
+                                        let selectedArtworkURL = firstSong.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
+                                        ItemLabel(name: firstSong.title, author: firstSong.artistName, imageURL: selectedArtworkURL)
+                                    }
+                                }
+                            }
                         }
+                        .navigationTitle(playlistName)
                     }
-                    
-                    Label {
-                        Text("Matching Songs")
-                    } icon: {
-                        if (matchingItems) {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "checkmark.circle")
+                } else {
+                    ProgressView {
+                        Text("Matching Songs...")
+                    }
+                    .task {
+                        switch syncController.selectedSource {
+                        case .spotify:
+                            playlistName = spotifyController.playlistToSync?.name ?? ""
+                        case .appleMusic:
+                            playlistName = musicKitController.playlistToSync?.name ?? ""
+                        }
+                        
+                        switch syncController.selectedTarget {
+                        case .spotify:
+                            // Match to Spotify
+                            print("Spotify")
+                        case .appleMusic:
+                            // Match to Apple Music
+                            print("Apple Music")
+                            do {
+                                var data: [MusicKitMatchedSongs] = []
+                                
+                                for item in sourceData {
+                                    let matchedItem = try await musicKitController.matchSong(searchObject: item, searchLimit: syncController.syncMatchingLimit, useAdvancedMatching: syncController.useAdvancedSync)
+                                    data.append(matchedItem)
+                                }
+                                
+                                data = data.sorted(by: { a, b in
+                                    return a.maxConfidence < b.maxConfidence
+                                })
+                                
+                                syncController.targetData = .appleMusic(data)
+                            } catch {
+                                print(error)
+                            }
                         }
                     }
                 }
-                .task {
+            } else {
+                ProgressView {
+                    Text("Loading Playlist data...")
+                }.task {
                     do {
-                        sourceData = try await getSourceData()
-                        loadingItems = false
-                        
-                        matchedData = await getMatchedSongs()
-                        matchingItems = false
+                        switch syncController.selectedSource {
+                        case .spotify:
+                            try await spotifyController.createCommonData()
+                            if let data = spotifyController.commonSongData {
+                                syncController.sourceData = data
+                            }
+                        case .appleMusic:
+                            try await musicKitController.createCommonData()
+                            if let data = musicKitController.commonSongData {
+                                syncController.sourceData = data
+                            }
+                        }
                     } catch {
                         print(error)
                     }
                 }
-            } else {
-                List(matchedData, id: \.self) { data in
-                    Section {
-                        ItemLabel(name: data.sourceSong.name, author: data.sourceSong.artist_name, imageURL: data.sourceSong.album_artwork_cover?.absoluteString ?? "")
-                        
-                        NavigationLink {
-                            List(data.targetSongs, id: \.self.song) { target in
-                                ItemLabel(name: target.song.name, author: target.song.artist_name, imageURL: target.song.album_artwork_cover?.absoluteString ?? "")
-                            }
-                            .navigationTitle("Alternatives")
-                        } label: {
-                            let firstSong = data.targetSongs.first
-                            let name = firstSong?.song.name ?? ""
-                            let artist = firstSong?.song.artist_name ?? ""
-                            let imageURL = firstSong?.song.album_artwork_cover?.absoluteString ?? ""
-                            
-                            ItemLabel(name: name, author: artist, imageURL: imageURL)
-                        }
-                    } header: {
-                        Text("\((data.maxConfidencePct), specifier: "%.0f")% Matching Confidence")
-                    }
-                    
-                }
-                .navigationTitle(playlistName)
-            }
-        }
-    }
-    
-    func getSourceData() async throws -> [CommonSongData] {
-        print("Getting Source Data")
-        switch selectedSource {
-        case .spotify:
-            playlistName = spotifyController.playlistToSync?.name ?? "Playlist"
-            try await spotifyController.createCommonData()
-            
-            if let items = spotifyController.commonSongData {
-                return items
-            } else {
-                return []
-            }
-        case .appleMusic:
-            playlistName = musicKitController.playlistToSync?.name ?? "Playlist"
-            try await musicKitController.createCommonData()
-            
-            if let items = musicKitController.commonSongData {
-                return items
-            } else {
-                return []
-            }
-        }
-    }
-    
-    func getMatchedSongs() async -> [MatchedSongs] {
-        switch selectedTarget {
-        case .spotify:
-            // Search Spotify API
-            print("Search in Spotify")
-            
-            return []
-        case .appleMusic:
-            // Search MusicKit
-            print("Search in Apple Music")
-            do {
-                var data: [MatchedSongs] = []
-                
-                for item in sourceData {
-                    let matchedItem = try await musicKitController.matchSong(searchObject: item, searchLimit: matchingLimit, useAdvancedMatching: useAdvancedMatching)
-                    data.append(matchedItem)
-                }
-                
-                data = data.sorted(by: { a, b in
-                    return a.maxConfidence < b.maxConfidence
-                })
-                
-                return data
-            } catch {
-                print(error)
-                
-                return []
             }
         }
     }
@@ -154,6 +118,6 @@ struct SyncSheet: View {
     return VStack {
         Text("Preview")
     }.sheet(isPresented: .constant(true)) {
-        SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, selectedSource: Service.spotify, selectedTarget: Service.appleMusic, matchingLimit: 5.0, useAdvancedMatching: true)
+        SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController())
     }
 }

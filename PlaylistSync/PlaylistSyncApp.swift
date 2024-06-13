@@ -11,10 +11,11 @@ import SwiftUI
 struct PlaylistSyncApp: App {
     @State private var spotifyController = SpotifyController()
     @State private var musicKitController = MusicKitController()
+    @State private var syncController = SyncController()
     
     var body: some Scene {
         WindowGroup {
-            ContentView(spotifyController: spotifyController, musicKitController: musicKitController)
+            ContentView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
         }
     }
 }

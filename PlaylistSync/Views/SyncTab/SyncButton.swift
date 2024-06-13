@@ -10,15 +10,11 @@ import SwiftUI
 struct SyncButton: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
-    
-    var selectedSource: Service
-    var selectedTarget: Service
-    
-    @Binding var showSyncSheet: Bool
+    var syncController: SyncController
     
     var body: some View {
         Section {
-            switch selectedSource {
+            switch syncController.selectedSource {
             case .spotify:
                 if let playlist = spotifyController.playlistToSync {
                     ItemLabel(
@@ -38,9 +34,9 @@ struct SyncButton: View {
             }
             
             Button {
-                showSyncSheet.toggle()
+                syncController.showSyncSheet.toggle()
             } label: {
-                switch selectedTarget {
+                switch syncController.selectedTarget {
                 case .spotify:
                     Label("Sync Playlist to Spotify", systemImage: "arrow.triangle.2.circlepath")
                         .font(.headline)
@@ -60,26 +56,26 @@ struct SyncButton: View {
         var targetDisabled = true
         var sameSourceAndTarget = true
         
-        switch selectedSource {
+        switch syncController.selectedSource {
         case .spotify:
             sourceDisabled = !spotifyController.authSuccess
         case .appleMusic:
             sourceDisabled = !musicKitController.authSuccess
         }
         
-        switch selectedTarget {
+        switch syncController.selectedTarget {
         case .spotify:
             targetDisabled = !spotifyController.authSuccess
         case .appleMusic:
             targetDisabled = !musicKitController.authSuccess
         }
         
-        sameSourceAndTarget = selectedSource == selectedTarget
+        sameSourceAndTarget = syncController.selectedSource == syncController.selectedTarget
         
         if (sourceDisabled || targetDisabled || sameSourceAndTarget ) {
             return true
         } else {
-            switch selectedSource {
+            switch syncController.selectedSource {
             case .spotify:
                 if spotifyController.playlistToSync == nil {
                     return true
@@ -99,6 +95,6 @@ struct SyncButton: View {
 
 #Preview {
     List {
-        SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: Service.spotify, selectedTarget: Service.appleMusic, showSyncSheet: .constant(false))
+        SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
     }
 }

@@ -10,13 +10,11 @@ import SwiftUI
 struct SyncData: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
-    
-    @Binding var selectedSource: Service
-    @Binding var selectedTarget: Service
+    @Bindable var syncController: SyncController
     
     var body: some View {
         Section {
-            Picker(selection: $selectedSource) {
+            Picker(selection: $syncController.selectedSource) {
                 Text("Spotify").tag(Service.spotify)
                 Text("Apple Music").tag(Service.appleMusic)
             } label: {
@@ -27,7 +25,7 @@ struct SyncData: View {
                 }
             }
             
-            Picker(selection: $selectedTarget) {
+            Picker(selection: $syncController.selectedTarget) {
                 Text("Spotify").tag(Service.spotify)
                 Text("Apple Music").tag(Service.appleMusic)
             } label: {
@@ -39,7 +37,7 @@ struct SyncData: View {
             }
             
             NavigationLink {
-                switch selectedSource {
+                switch syncController.selectedSource {
                 case .spotify:
                     if (spotifyController.authSuccess) {
                         SpotifyPlaylists(spotifyController: spotifyController)
@@ -73,7 +71,7 @@ struct SyncData: View {
                 Label {
                     Text("Choose Playlist")
                 } icon: {
-                    switch selectedSource {
+                    switch syncController.selectedSource {
                     case .spotify:
                         Image("SpotifyIcon")
                             .resizable()
@@ -93,6 +91,6 @@ struct SyncData: View {
 
 #Preview {
     List {
-        SyncData(spotifyController: SpotifyController(), musicKitController: MusicKitController(), selectedSource: .constant(Service.spotify), selectedTarget: .constant(Service.appleMusic))
+        SyncData(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
     }
 }

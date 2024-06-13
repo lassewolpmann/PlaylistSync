@@ -11,15 +11,14 @@ struct SyncSettings: View {
     @State var showSliderInfo = false
     @State var showToggleInfo = false
     
-    @Binding var matchingLimit: Double
-    @Binding var useAdvancedMatching: Bool
+    @Bindable var syncController: SyncController
     
     var body: some View {
         Section {
             HStack(spacing: 15) {
                 VStack(alignment: .leading) {
                     Slider(
-                        value: $matchingLimit,
+                        value: $syncController.syncMatchingLimit,
                         in: 5...25,
                         step: 1
                     ) {
@@ -31,9 +30,8 @@ struct SyncSettings: View {
                     }
                     .foregroundStyle(.secondary)
                     .font(.subheadline)
-                    
                     Label {
-                        Text("Current Matching Limit: \(Int(matchingLimit))")
+                        Text("Current Matching Limit: \(Int(syncController.syncMatchingLimit))")
                     } icon: {
                         Image(systemName: "magnifyingglass.circle")
                             .foregroundStyle(.green)
@@ -46,9 +44,8 @@ struct SyncSettings: View {
                     Image(systemName: "questionmark.circle")
                 }
             }
-            
             HStack(spacing: 15) {
-                Toggle(isOn: $useAdvancedMatching) {
+                Toggle(isOn: $syncController.useAdvancedSync) {
                     Label {
                         Text("Advanced Sync")
                     } icon: {
@@ -103,6 +100,6 @@ struct SyncSettings: View {
 
 #Preview {
     List {
-        SyncSettings(matchingLimit: .constant(5.0), useAdvancedMatching: .constant(false))
+        SyncSettings(syncController: SyncController())
     }
 }

@@ -146,6 +146,7 @@ struct SpotifyPlaylist: Decodable {
                 var name: String = "Preview Track Object"
                 var preview_url: String?
                 var track_number: Int = 0
+                var uri: String = ""
                 
                 // Values if track is an EpisodeObject
                 // Since we don't care about episodes, I'll just let the decoding fail on this one

@@ -12,6 +12,7 @@
 		252E5E542C1AC099000526B2 /* MusicKitPlaylists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 252E5E532C1AC099000526B2 /* MusicKitPlaylists.swift */; };
 		25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */; };
 		25520F4E2BFDBA6200BAFC46 /* Spotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25520F4D2BFDBA6200BAFC46 /* Spotify.swift */; };
+		2568E3D52C1AF894004D0612 /* SyncController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2568E3D42C1AF894004D0612 /* SyncController.swift */; };
 		257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */; };
 		257A68AA2BFCFD080056916E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257A68A92BFCFD080056916E /* ContentView.swift */; };
 		257A68AC2BFCFD080056916E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 257A68AB2BFCFD080056916E /* Assets.xcassets */; };
@@ -38,6 +39,7 @@
 		25520F472BFDB8B500BAFC46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKit.swift; sourceTree = "<group>"; };
 		25520F4D2BFDBA6200BAFC46 /* Spotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spotify.swift; sourceTree = "<group>"; };
+		2568E3D42C1AF894004D0612 /* SyncController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncController.swift; sourceTree = "<group>"; };
 		257A68A42BFCFD080056916E /* PlaylistSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlaylistSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		257A68A72BFCFD080056916E /* PlaylistSyncApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSyncApp.swift; sourceTree = "<group>"; };
 		257A68A92BFCFD080056916E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -76,6 +78,13 @@
 				252E5E532C1AC099000526B2 /* MusicKitPlaylists.swift */,
 			);
 			path = Playlists;
+			sourceTree = "<group>";
+		};
+		2568E3D62C1B0C5A004D0612 /* SyncSheets */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SyncSheets;
 			sourceTree = "<group>";
 		};
 		257A689B2BFCFD080056916E = {
@@ -144,6 +153,7 @@
 			children = (
 				25520F4B2BFDBA5D00BAFC46 /* MusicKit.swift */,
 				25520F4D2BFDBA6200BAFC46 /* Spotify.swift */,
+				2568E3D42C1AF894004D0612 /* SyncController.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -169,6 +179,7 @@
 		25EA7D8F2C18888600E7FDB8 /* SyncTab */ = {
 			isa = PBXGroup;
 			children = (
+				2568E3D62C1B0C5A004D0612 /* SyncSheets */,
 				252E5E502C1AC064000526B2 /* Playlists */,
 				257ACE342C188925004F9BA2 /* AuthStatus.swift */,
 				25E40A972C19AFC700A2A834 /* SyncData.swift */,
@@ -270,6 +281,7 @@
 				259187E52BFF1205002D03EF /* SettingsTabView.swift in Sources */,
 				257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */,
 				252E5E4E2C1ABADD000526B2 /* SyncSheet.swift in Sources */,
+				2568E3D52C1AF894004D0612 /* SyncController.swift in Sources */,
 				259187E92BFF1FE0002D03EF /* ItemLabel.swift in Sources */,
 				25EA7D892C183FC400E7FDB8 /* SpotifyErrors.swift in Sources */,
 				25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */,

@@ -49,7 +49,7 @@ import Vision
         }
     }
     
-    func matchSong(searchObject: CommonSongData, searchLimit: Double, useAdvancedMatching: Bool) async throws -> MatchedSongs {
+    func matchSong(searchObject: CommonSongData, searchLimit: Double, useAdvancedMatching: Bool) async throws -> MusicKitMatchedSongs {
         var request = MusicCatalogSearchRequest(term: "\(searchObject.fixedName) \(searchObject.artist_name)", types: [Song.self])
         request.limit = Int(searchLimit)
         
@@ -70,7 +70,7 @@ import Vision
                 let commonSong = CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: item.releaseDate, album_artwork_cover: artwork?.url(width: 640, height: 640), album_artwork_width: 640, album_artwork_height: 640)
                 
                 let confidence = calculateConfidence(sourceData: searchObject, targetData: commonSong, useAdvancedMatching: useAdvancedMatching, sourceFeaturePrint: sourceFeaturePrint)
-                return MatchedSong(song: commonSong, confidence: confidence)
+                return MusicKitMatchedSongs.MatchedSong(song: item, confidence: confidence)
             }.sorted(by: { a, b in
                 a.confidence > b.confidence
             })
@@ -80,9 +80,9 @@ import Vision
             // 45 is highest possible confidence score
             let maxConfidencePct = useAdvancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
             
-            return MatchedSongs(targetSongs: matchedSongs, sourceSong: searchObject, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
+            return MusicKitMatchedSongs(sourceData: searchObject, matchedData: matchedSongs, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
-            return MatchedSongs(sourceSong: searchObject)
+            throw MusicKitError.matchingError("Could not match song")
         }
     }
     
@@ -94,17 +94,6 @@ import Vision
             return "Successfully created Playlist in your Library."
         } catch {
             return "Could not create Playlist: \(error.localizedDescription)."
-        }
-    }
-    
-    func updatedPlaylist(playlist: Playlist, songs: [Song?]) async -> String {
-        do {
-            let library = MusicLibrary.shared
-            try await library.edit(playlist, items: songs.compactMap { $0 })
-            
-            return "Successfully updated Playlist."
-        } catch {
-            return "Could not update Playlist: \(error.localizedDescription)."
         }
     }
     

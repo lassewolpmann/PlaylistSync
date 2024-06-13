@@ -10,10 +10,11 @@ import SwiftUI
 struct ContentView: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
+    var syncController: SyncController
     
     var body: some View {
         TabView {
-            SyncTabView(spotifyController: spotifyController, musicKitController: musicKitController)
+            SyncTabView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
             .tabItem {
                 Label("Sync", systemImage: "arrow.triangle.2.circlepath")
             }
@@ -33,5 +34,5 @@ struct ContentView: View {
     spotifyController.authSuccess = true
     musicKitController.authSuccess = true
     
-    return ContentView(spotifyController: spotifyController, musicKitController: musicKitController)
+    return ContentView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController())
 }
