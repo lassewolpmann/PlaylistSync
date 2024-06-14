@@ -17,13 +17,12 @@ struct SyncTabView: View {
         NavigationStack {
             List {
                 AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
+                
                 SyncData(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
+                
                 SyncSettings(syncController: syncController)
                 SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
             }
-            .sheet(isPresented: $syncController.showSyncSheet, content: {
-                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-            })
             .navigationTitle("Sync")
         }
     }
@@ -33,8 +32,8 @@ struct SyncTabView: View {
     let spotifyController = SpotifyController()
     let musicKitController = MusicKitController()
     
-    spotifyController.authSuccess = true
-    musicKitController.authSuccess = true
+    spotifyController.authSuccess = false
+    musicKitController.authSuccess = false
     
     return SyncTabView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController())
 }

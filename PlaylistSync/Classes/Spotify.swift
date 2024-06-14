@@ -18,14 +18,12 @@ import AuthenticationServices
     var codeVerifier: String? = nil
     var codeChallenge: String? = nil
     var state: String? = nil
-    
     var authSuccess: Bool = false
     var authData: AuthData? = nil
-    
     var tokenRefreshDate: Date = Date()
     
-    var playlistToSync: UserPlaylists.Playlist?
-    var commonSongData: [CommonSongData]?
+    var playlistOverview: UserPlaylists?
+    var selectedPlaylist: UserPlaylists.Playlist?
     
     init() {
         codeVerifier = self.generateRandomString(length: 64)
@@ -122,25 +120,6 @@ import AuthenticationServices
         }
     }
     
-    func getUserData() async throws -> UserData {
-        guard let url = URL(string: "https://api.spotify.com/v1/me") else { throw SpotifyError.urlError("Could not get User Data URL") }
-        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        let statusCode = (response as! HTTPURLResponse).statusCode
-        
-        if (statusCode == 200) {
-            let userData = try JSONDecoder().decode(UserData.self, from: data)
-            return userData
-        } else {
-            let _ = try JSONDecoder().decode(GenericError.self, from: data)
-            throw SpotifyError.dataError("Could not get User Data")
-        }
-    }
-    
     func getUserPlaylists() async throws -> UserPlaylists {
         guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
         
@@ -161,6 +140,7 @@ import AuthenticationServices
         
         if (statusCode == 200) {
             let userPlaylists = try JSONDecoder().decode(UserPlaylists.self, from: data)
+            
             return userPlaylists
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)
@@ -168,98 +148,79 @@ import AuthenticationServices
         }
     }
     
-    func getPlaylist(playlistID: String) async throws -> SpotifyPlaylist {
-        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
-        
-        guard let url = URL(string: "https://api.spotify.com/v1/playlists/\(playlistID)") else { throw SpotifyError.urlError("Could not get User Playlists URL") }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        let statusCode = (response as! HTTPURLResponse).statusCode
-                
-        if (statusCode == 200) {
-            let playlist = try JSONDecoder().decode(SpotifyPlaylist.self, from: data)
+    func createCommonData(playlist: UserPlaylists.Playlist) async throws -> [CommonSongData] {
+        func getPlaylistItems(url: String, total: Int) async throws -> [SpotifyPlaylist.Tracks.Track.TrackObject] {
+            guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
             
-            return playlist
-        } else {
-            let _ = try JSONDecoder().decode(GenericError.self, from: data)
-            throw SpotifyError.dataError("Could not get Playlist")
-        }
-    }
-    
-    func getPlaylistItems(url: String, total: Int) async throws -> [SpotifyPlaylist.Tracks.Track.TrackObject] {
-        guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
-        
-        var tracks: [SpotifyPlaylist.Tracks.Track.TrackObject] = []
-        var requestURL: String? = url
-        
-        while (requestURL != nil) {
-            if let url = requestURL {
-                guard let url = URL(string: url) else { throw SpotifyError.urlError("Could not get Playlist Items URL") }
-                var request = URLRequest(url: url)
-                request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
-                
-                let (data, response) = try await URLSession.shared.data(for: request)
-                let statusCode = (response as! HTTPURLResponse).statusCode
-                
-                if (statusCode == 200) {
-                    let playlist = try JSONDecoder().decode(SpotifyPlaylist.Tracks.self, from: data)
-                    requestURL = playlist.next
+            var tracks: [SpotifyPlaylist.Tracks.Track.TrackObject] = []
+            var requestURL: String? = url
+            
+            while (requestURL != nil) {
+                if let url = requestURL {
+                    guard let url = URL(string: url) else { throw SpotifyError.urlError("Could not get Playlist Items URL") }
+                    var request = URLRequest(url: url)
+                    request.setValue("Bearer \(access_token)", forHTTPHeaderField: "Authorization")
                     
-                    let trackItems = playlist.items.map { $0.track }
-                    tracks.append(contentsOf: trackItems)
-                } else {
-                    let _ = try JSONDecoder().decode(GenericError.self, from: data)
-                    throw SpotifyError.dataError("Could not get Playlist")
+                    let (data, response) = try await URLSession.shared.data(for: request)
+                    let statusCode = (response as! HTTPURLResponse).statusCode
+                    
+                    if (statusCode == 200) {
+                        let playlist = try JSONDecoder().decode(SpotifyPlaylist.Tracks.self, from: data)
+                        requestURL = playlist.next
+                        
+                        let trackItems = playlist.items.map { $0.track }
+                        tracks.append(contentsOf: trackItems)
+                    } else {
+                        let _ = try JSONDecoder().decode(GenericError.self, from: data)
+                        throw SpotifyError.dataError("Could not get Playlist")
+                    }
                 }
-            }
-        }
-        
-        return tracks
-    }
-    
-    func createCommonData() async throws -> Void {
-        if let playlist = self.playlistToSync {
-            let items = try await self.getPlaylistItems(url: playlist.tracks.href, total: playlist.tracks.total)
-            let commonSongData = items.map { item in
-                let name = item.name
-                let disc_number = item.disc_number
-                let track_number = item.track_number
-                let artist = item.artists.first?.name ?? "Unknown Artist"
-                let isrc = item.external_ids.isrc ?? "Unknown ISRC"
-                let duration_ms = item.duration_ms
-                let album = item.album
-                
-                // Spotify has different precisions for the album release date. Therefore I need to check the precision first before setting the right format for the date formatter.
-                let formatter = DateFormatter()
-                
-                if (album.release_date_precision == "year") {
-                    formatter.dateFormat = "yyyy"
-                } else if (album.release_date_precision == "month") {
-                    formatter.dateFormat = "yyyy-MM"
-                } else if (album.release_date_precision == "day") {
-                    formatter.dateFormat = "yyyy-MM-dd"
-                }
-                
-                formatter.timeZone = TimeZone(abbreviation: "UTC")
-                let date = formatter.date(from: album.release_date)
-                
-                let artwork_cover = item.album.images.first
-                let artwork_cover_url = URL(string: artwork_cover?.url ?? "")
-                
-                return CommonSongData(name: name, disc_number: disc_number, track_number: track_number, artist_name: artist, isrc: isrc, duration_in_ms: duration_ms, album_name: album.name, album_release_date: date, album_artwork_cover: artwork_cover_url, album_artwork_width: artwork_cover?.width, album_artwork_height: artwork_cover?.height)
             }
             
-            self.commonSongData = commonSongData
-        } else {
-            throw SpotifyError.dataError("Could not create common Data.")
+            return tracks
         }
+        
+        let items = try await getPlaylistItems(url: playlist.tracks.href, total: playlist.tracks.total)
+        let commonSongData = items.map { item in
+            let name = item.name
+            let disc_number = item.disc_number
+            let track_number = item.track_number
+            let artist = item.artists.first?.name ?? "Unknown Artist"
+            let isrc = item.external_ids.isrc ?? "Unknown ISRC"
+            let duration_ms = item.duration_ms
+            let album = item.album
+            
+            // Spotify has different precisions for the album release date. Therefore I need to check the precision first before setting the right format for the date formatter.
+            let formatter = DateFormatter()
+            
+            if (album.release_date_precision == "year") {
+                formatter.dateFormat = "yyyy"
+            } else if (album.release_date_precision == "month") {
+                formatter.dateFormat = "yyyy-MM"
+            } else if (album.release_date_precision == "day") {
+                formatter.dateFormat = "yyyy-MM-dd"
+            }
+            
+            formatter.timeZone = TimeZone(abbreviation: "UTC")
+            let date = formatter.date(from: album.release_date)
+            
+            let artwork_cover = item.album.images.first
+            let artwork_cover_url = URL(string: artwork_cover?.url ?? "")
+            
+            return CommonSongData(name: name, disc_number: disc_number, track_number: track_number, artist_name: artist, isrc: isrc, duration_in_ms: duration_ms, album_name: album.name, album_release_date: date, album_artwork_cover: artwork_cover_url, album_artwork_width: artwork_cover?.width, album_artwork_height: artwork_cover?.height)
+        }
+        
+        return commonSongData
     }
     
-    func revokeToken() -> Void {
-        self.authData = nil
+    func reset() -> Void {
+        self.codeVerifier = nil
+        self.codeChallenge = nil
+        self.state = nil
         self.authSuccess = false
+        self.authData = nil
+        self.tokenRefreshDate = Date()
+        self.playlistOverview = nil
+        self.selectedPlaylist = nil
     }
 }

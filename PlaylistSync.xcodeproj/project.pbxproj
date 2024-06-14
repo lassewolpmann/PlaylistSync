@@ -23,10 +23,13 @@
 		259187E92BFF1FE0002D03EF /* ItemLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 259187E82BFF1FE0002D03EF /* ItemLabel.swift */; };
 		2595CE7F2BFE004600938A15 /* SpotifyResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */; };
 		25CBEDC32C039F6D00CB624C /* HorizontalAlignedLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CBEDC22C039F6D00CB624C /* HorizontalAlignedLabel.swift */; };
+		25D6FB2E2C1C0C42000CB9BD /* PlaylistSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6FB2D2C1C0C42000CB9BD /* PlaylistSelection.swift */; };
+		25D6FB362C1C177B000CB9BD /* SyncToMusicKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6FB352C1C177B000CB9BD /* SyncToMusicKit.swift */; };
+		25D6FB382C1C1781000CB9BD /* SyncToSpotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6FB372C1C1781000CB9BD /* SyncToSpotify.swift */; };
+		25D6FB3C2C1C1A01000CB9BD /* MusicKitMatchedSongs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25D6FB3B2C1C1A01000CB9BD /* MusicKitMatchedSongs.swift */; };
 		25E40A982C19AFC700A2A834 /* SyncData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E40A972C19AFC700A2A834 /* SyncData.swift */; };
 		25E40A9A2C19B04A00A2A834 /* SyncSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E40A992C19B04A00A2A834 /* SyncSettings.swift */; };
 		25E40A9E2C19B12D00A2A834 /* SyncButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E40A9D2C19B12D00A2A834 /* SyncButton.swift */; };
-		25E40AA02C19B2D400A2A834 /* CommonSongData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E40A9F2C19B2D400A2A834 /* CommonSongData.swift */; };
 		25EA7D822C18266000E7FDB8 /* SyncTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EA7D812C18266000E7FDB8 /* SyncTabView.swift */; };
 		25EA7D892C183FC400E7FDB8 /* SpotifyErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EA7D882C183FC400E7FDB8 /* SpotifyErrors.swift */; };
 		25EA7D8B2C183FD600E7FDB8 /* MusicKitErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EA7D8A2C183FD600E7FDB8 /* MusicKitErrors.swift */; };
@@ -51,10 +54,13 @@
 		259187E82BFF1FE0002D03EF /* ItemLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemLabel.swift; sourceTree = "<group>"; };
 		2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyResponses.swift; sourceTree = "<group>"; };
 		25CBEDC22C039F6D00CB624C /* HorizontalAlignedLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalAlignedLabel.swift; sourceTree = "<group>"; };
+		25D6FB2D2C1C0C42000CB9BD /* PlaylistSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSelection.swift; sourceTree = "<group>"; };
+		25D6FB352C1C177B000CB9BD /* SyncToMusicKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncToMusicKit.swift; sourceTree = "<group>"; };
+		25D6FB372C1C1781000CB9BD /* SyncToSpotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncToSpotify.swift; sourceTree = "<group>"; };
+		25D6FB3B2C1C1A01000CB9BD /* MusicKitMatchedSongs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitMatchedSongs.swift; sourceTree = "<group>"; };
 		25E40A972C19AFC700A2A834 /* SyncData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncData.swift; sourceTree = "<group>"; };
 		25E40A992C19B04A00A2A834 /* SyncSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncSettings.swift; sourceTree = "<group>"; };
 		25E40A9D2C19B12D00A2A834 /* SyncButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncButton.swift; sourceTree = "<group>"; };
-		25E40A9F2C19B2D400A2A834 /* CommonSongData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonSongData.swift; sourceTree = "<group>"; };
 		25EA7D812C18266000E7FDB8 /* SyncTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTabView.swift; sourceTree = "<group>"; };
 		25EA7D882C183FC400E7FDB8 /* SpotifyErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyErrors.swift; sourceTree = "<group>"; };
 		25EA7D8A2C183FD600E7FDB8 /* MusicKitErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitErrors.swift; sourceTree = "<group>"; };
@@ -83,6 +89,8 @@
 		2568E3D62C1B0C5A004D0612 /* SyncSheets */ = {
 			isa = PBXGroup;
 			children = (
+				25D6FB3A2C1C19C5000CB9BD /* Spotify */,
+				25D6FB392C1C19BD000CB9BD /* MusicKit */,
 			);
 			path = SyncSheets;
 			sourceTree = "<group>";
@@ -148,6 +156,33 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		25D6FB2C2C1C0C34000CB9BD /* SyncData */ = {
+			isa = PBXGroup;
+			children = (
+				252E5E502C1AC064000526B2 /* Playlists */,
+				25E40A972C19AFC700A2A834 /* SyncData.swift */,
+				25D6FB2D2C1C0C42000CB9BD /* PlaylistSelection.swift */,
+			);
+			path = SyncData;
+			sourceTree = "<group>";
+		};
+		25D6FB392C1C19BD000CB9BD /* MusicKit */ = {
+			isa = PBXGroup;
+			children = (
+				25D6FB352C1C177B000CB9BD /* SyncToMusicKit.swift */,
+				25D6FB3B2C1C1A01000CB9BD /* MusicKitMatchedSongs.swift */,
+			);
+			path = MusicKit;
+			sourceTree = "<group>";
+		};
+		25D6FB3A2C1C19C5000CB9BD /* Spotify */ = {
+			isa = PBXGroup;
+			children = (
+				25D6FB372C1C1781000CB9BD /* SyncToSpotify.swift */,
+			);
+			path = Spotify;
+			sourceTree = "<group>";
+		};
 		25EA7D832C183F6B00E7FDB8 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -162,7 +197,6 @@
 			isa = PBXGroup;
 			children = (
 				2595CE7E2BFE004600938A15 /* SpotifyResponses.swift */,
-				25E40A9F2C19B2D400A2A834 /* CommonSongData.swift */,
 			);
 			path = Structs;
 			sourceTree = "<group>";
@@ -179,13 +213,12 @@
 		25EA7D8F2C18888600E7FDB8 /* SyncTab */ = {
 			isa = PBXGroup;
 			children = (
-				2568E3D62C1B0C5A004D0612 /* SyncSheets */,
-				252E5E502C1AC064000526B2 /* Playlists */,
 				257ACE342C188925004F9BA2 /* AuthStatus.swift */,
-				25E40A972C19AFC700A2A834 /* SyncData.swift */,
+				25D6FB2C2C1C0C34000CB9BD /* SyncData */,
 				25E40A992C19B04A00A2A834 /* SyncSettings.swift */,
 				25E40A9D2C19B12D00A2A834 /* SyncButton.swift */,
 				252E5E4D2C1ABADD000526B2 /* SyncSheet.swift */,
+				2568E3D62C1B0C5A004D0612 /* SyncSheets */,
 			);
 			path = SyncTab;
 			sourceTree = "<group>";
@@ -271,17 +304,20 @@
 				257ACE352C188925004F9BA2 /* AuthStatus.swift in Sources */,
 				257A68AA2BFCFD080056916E /* ContentView.swift in Sources */,
 				25EA7D8B2C183FD600E7FDB8 /* MusicKitErrors.swift in Sources */,
+				25D6FB382C1C1781000CB9BD /* SyncToSpotify.swift in Sources */,
 				25E40A982C19AFC700A2A834 /* SyncData.swift in Sources */,
 				2595CE7F2BFE004600938A15 /* SpotifyResponses.swift in Sources */,
 				25CBEDC32C039F6D00CB624C /* HorizontalAlignedLabel.swift in Sources */,
 				25520F4E2BFDBA6200BAFC46 /* Spotify.swift in Sources */,
 				25E40A9A2C19B04A00A2A834 /* SyncSettings.swift in Sources */,
-				25E40AA02C19B2D400A2A834 /* CommonSongData.swift in Sources */,
 				25E40A9E2C19B12D00A2A834 /* SyncButton.swift in Sources */,
+				25D6FB3C2C1C1A01000CB9BD /* MusicKitMatchedSongs.swift in Sources */,
 				259187E52BFF1205002D03EF /* SettingsTabView.swift in Sources */,
 				257A68A82BFCFD080056916E /* PlaylistSyncApp.swift in Sources */,
 				252E5E4E2C1ABADD000526B2 /* SyncSheet.swift in Sources */,
+				25D6FB2E2C1C0C42000CB9BD /* PlaylistSelection.swift in Sources */,
 				2568E3D52C1AF894004D0612 /* SyncController.swift in Sources */,
+				25D6FB362C1C177B000CB9BD /* SyncToMusicKit.swift in Sources */,
 				259187E92BFF1FE0002D03EF /* ItemLabel.swift in Sources */,
 				25EA7D892C183FC400E7FDB8 /* SpotifyErrors.swift in Sources */,
 				25520F4C2BFDBA5D00BAFC46 /* MusicKit.swift in Sources */,

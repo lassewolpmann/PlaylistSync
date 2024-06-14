@@ -16,25 +16,25 @@ struct SyncButton: View {
         Section {
             switch syncController.selectedSource {
             case .spotify:
-                if let playlist = spotifyController.playlistToSync {
-                    ItemLabel(
-                        name: playlist.name,
-                        author: playlist.owner.display_name ?? "",
-                        imageURL: playlist.images.first?.url ?? ""
-                    )
+                if let selectedPlaylist = spotifyController.selectedPlaylist {
+                    let name = selectedPlaylist.name
+                    let author = selectedPlaylist.owner.display_name ?? ""
+                    let imageURL = selectedPlaylist.images.first?.url ?? ""
+                    
+                    ItemLabel(name: name, author: author, imageURL: imageURL)
                 }
             case .appleMusic:
-                if let playlist = musicKitController.playlistToSync {
-                    ItemLabel(
-                        name: playlist.name,
-                        author: playlist.curatorName ?? "",
-                        imageURL: playlist.artwork?.url(width: 50, height: 50)?.absoluteString ?? ""
-                    )
+                if let selectedPlaylist = musicKitController.selectedPlaylist {
+                    let name = selectedPlaylist.name
+                    let author = selectedPlaylist.curatorName ?? ""
+                    let imageURL = selectedPlaylist.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
+                    
+                    ItemLabel(name: name, author: author, imageURL: imageURL)
                 }
             }
             
-            Button {
-                syncController.showSyncSheet.toggle()
+            NavigationLink {
+                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
             } label: {
                 switch syncController.selectedTarget {
                 case .spotify:
@@ -55,12 +55,15 @@ struct SyncButton: View {
         var sourceDisabled = true
         var targetDisabled = true
         var sameSourceAndTarget = true
+        var playlistIsNil = true
         
         switch syncController.selectedSource {
         case .spotify:
             sourceDisabled = !spotifyController.authSuccess
+            playlistIsNil = spotifyController.selectedPlaylist == nil
         case .appleMusic:
             sourceDisabled = !musicKitController.authSuccess
+            playlistIsNil = musicKitController.selectedPlaylist == nil
         }
         
         switch syncController.selectedTarget {
@@ -72,23 +75,10 @@ struct SyncButton: View {
         
         sameSourceAndTarget = syncController.selectedSource == syncController.selectedTarget
         
-        if (sourceDisabled || targetDisabled || sameSourceAndTarget ) {
+        if (sourceDisabled || targetDisabled || sameSourceAndTarget || playlistIsNil) {
             return true
         } else {
-            switch syncController.selectedSource {
-            case .spotify:
-                if spotifyController.playlistToSync == nil {
-                    return true
-                } else {
-                    return false
-                }
-            case .appleMusic:
-                if musicKitController.playlistToSync == nil {
-                    return true
-                } else {
-                    return false
-                }
-            }
+            return false
         }
     }
 }

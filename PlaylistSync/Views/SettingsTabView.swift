@@ -50,16 +50,16 @@ struct SettingsTabView: View {
                                     let urlWithCode = try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: "playlistsync")
                                     try await spotifyController.exchangeCodeForToken(urlWithCode: urlWithCode)
                                 } catch {
-                                    spotifyController.revokeToken()
+                                    spotifyController.reset()
                                     spotifyAuthInProgress = false
                                 }
                             } else {
-                                spotifyController.revokeToken()
+                                spotifyController.reset()
                                 spotifyAuthInProgress = false
                             }
                         }
                     } else {
-                        spotifyController.revokeToken()
+                        spotifyController.reset()
                     }
                 }
                 .onChange(of: musicKitAuthInProgress) { oldValue, newValue in
@@ -68,7 +68,7 @@ struct SettingsTabView: View {
                             let _ = await musicKitController.authorize();
                         }
                     } else {
-                        musicKitController.authSuccess = false
+                        musicKitController.reset()
                     }
                 }
             }

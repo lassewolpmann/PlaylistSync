@@ -11,9 +11,8 @@ import Vision
 
 @Observable class MusicKitController {
     var authSuccess: Bool = false
-    
-    var playlistToSync: Playlist?
-    var commonSongData: [CommonSongData]?
+    var playlistOverview: MusicItemCollection<Playlist>?
+    var selectedPlaylist: Playlist?
     
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
@@ -32,24 +31,7 @@ import Vision
         }
     }
     
-    func getPlaylist(playlist: Playlist?) async -> Playlist? {
-        if let playlist {
-            do {
-                let detailedPlaylist = try await playlist.with(.tracks)
-
-                return detailedPlaylist
-                
-            } catch {
-                print(error)
-                
-                return nil
-            }
-        } else {
-            return nil
-        }
-    }
-    
-    func matchSong(searchObject: CommonSongData, searchLimit: Double, useAdvancedMatching: Bool) async throws -> MusicKitMatchedSongs {
+    func matchSong(searchObject: CommonSongData, searchLimit: Double, useAdvancedMatching: Bool) async throws -> SyncToMusicKit.MatchedSongs {
         var request = MusicCatalogSearchRequest(term: "\(searchObject.fixedName) \(searchObject.artist_name)", types: [Song.self])
         request.limit = Int(searchLimit)
         
@@ -70,7 +52,7 @@ import Vision
                 let commonSong = CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: item.releaseDate, album_artwork_cover: artwork?.url(width: 640, height: 640), album_artwork_width: 640, album_artwork_height: 640)
                 
                 let confidence = calculateConfidence(sourceData: searchObject, targetData: commonSong, useAdvancedMatching: useAdvancedMatching, sourceFeaturePrint: sourceFeaturePrint)
-                return MusicKitMatchedSongs.MatchedSong(song: item, confidence: confidence)
+                return SyncToMusicKit.MatchedSongs.MatchedSong(song: item, confidence: confidence)
             }.sorted(by: { a, b in
                 a.confidence > b.confidence
             })
@@ -80,7 +62,7 @@ import Vision
             // 45 is highest possible confidence score
             let maxConfidencePct = useAdvancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
             
-            return MusicKitMatchedSongs(sourceData: searchObject, matchedData: matchedSongs, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
+            return SyncToMusicKit.MatchedSongs(sourceData: searchObject, matchedData: matchedSongs, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
             throw MusicKitError.matchingError("Could not match song")
         }
@@ -97,36 +79,42 @@ import Vision
         }
     }
     
-    func createCommonData() async throws -> Void {
-        if let playlist = await self.getPlaylist(playlist: self.playlistToSync) {
-            if let items = playlist.tracks {
-                var detailedItems: [Song] = []
-                
-                for item in items {
-                    switch item {
-                    case .song(let song):
-                        let detailedSong = try await song.with(.albums)
-                        
-                        detailedItems.append(detailedSong)
-                    case .musicVideo:
-                        print("Ignoring Music Videos")
-                    }
-                }
-                
-                let commonSongData = detailedItems.map { item in
-                    let duration_in_ms = Int(item.duration ?? 0) * 1000
-                    let album = item.albums?.first
-                    let album_artwork = album?.artwork?.url(width: 640, height: 640)
+    func createCommonData(playlist: Playlist) async throws -> [CommonSongData] {
+        let detailedPlaylist = try await playlist.with(.tracks)
+        
+        if let items = detailedPlaylist.tracks {
+            var detailedItems: [Song] = []
+            
+            for item in items {
+                switch item {
+                case .song(let song):
+                    let detailedSong = try await song.with(.albums)
                     
-                    return CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: album?.releaseDate, album_artwork_cover: album_artwork, album_artwork_width: 640, album_artwork_height: 640)
+                    detailedItems.append(detailedSong)
+                case .musicVideo:
+                    print("Ignoring Music Videos")
+                @unknown default:
+                    print("Unknown case")
                 }
-                                
-                self.commonSongData = commonSongData
-            } else {
-                throw MusicKitError.resourceError("Could not create Common Data")
             }
+            
+            let commonSongData = detailedItems.map { item in
+                let duration_in_ms = Int(item.duration ?? 0) * 1000
+                let album = item.albums?.first
+                let album_artwork = album?.artwork?.url(width: 640, height: 640)
+                
+                return CommonSongData(name: item.title, disc_number: item.discNumber ?? 0, track_number: item.trackNumber ?? 0, artist_name: item.artistName, isrc: item.isrc ?? "Unknown ISRC", duration_in_ms: duration_in_ms, album_name: item.albumTitle ?? "Unknown Album", album_release_date: album?.releaseDate, album_artwork_cover: album_artwork, album_artwork_width: 640, album_artwork_height: 640)
+            }
+                            
+            return commonSongData
         } else {
             throw MusicKitError.resourceError("Could not create Common Data")
         }
+    }
+    
+    func reset() -> Void {
+        authSuccess = false
+        playlistOverview = nil
+        selectedPlaylist = nil
     }
 }

@@ -24,6 +24,17 @@ struct ContentView: View {
                     Label("Settings", systemImage: "gear")
                 }
         }
+        .disabled(syncController.addingPlaylist)
+        .overlay {
+            if (syncController.addingPlaylist) {
+                ProgressView {
+                    Text("Adding Playlist to your Library")
+                        .font(.headline)
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 10).fill(.ultraThinMaterial))
+            }
+        }
     }
 }
 

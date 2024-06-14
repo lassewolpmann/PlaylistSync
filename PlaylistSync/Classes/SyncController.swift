@@ -8,42 +8,38 @@
 import Foundation
 import MusicKit
 
-struct SpotifyMatchedSongs {
-    struct MatchedSong {
-        let song: SpotifyPlaylist.Tracks.Track.TrackObject
-        let confidence: Int
-    }
+struct CommonSongData: Hashable {
+    var name: String = "Preview Song"
+    var disc_number: Int = 0
+    var track_number: Int = 0
+    var artist_name: String = "Preview Artist"
+    var isrc: String = "Preview ISRC"
+    var duration_in_ms: Int = 1
+    var album_name: String = "Preview Album"
+    var album_release_date: Date?
+    var album_artwork_cover: URL?
+    var album_artwork_width: Int?
+    var album_artwork_height: Int?
     
-    let sourceData: CommonSongData
-    let matchedData: [SpotifyMatchedSongs.MatchedSong]
-    let maxConfidence: Int
-    let maxConfidencePct: Double
-}
-
-struct MusicKitMatchedSongs {
-    struct MatchedSong: Identifiable {
-        let song: Song
-        let confidence: Int
+    var fixedName: String {
+        var fixedName = name.components(separatedBy: "-").first ?? name
+        fixedName = fixedName.components(separatedBy: "(").first ?? name
+        fixedName = fixedName.replacingOccurrences(of: "`", with: "'")
+        fixedName = fixedName.replacingOccurrences(of: "fuck", with: "f**k", options: .caseInsensitive)
+        fixedName = fixedName.trimmingCharacters(in: .whitespaces)
         
-        var id: String {
-            song.id.description
+        // If original Name contained live, it should be added back to the fixed Name, but only if it has been removed from the fixedName in previous steps
+        if (name.lowercased().contains("live") && !fixedName.lowercased().contains("live")) {
+            fixedName = fixedName + " live"
         }
+        
+        return fixedName
     }
-    
-    let sourceData: CommonSongData
-    let matchedData: [MusicKitMatchedSongs.MatchedSong]
-    let maxConfidence: Int
-    let maxConfidencePct: Double
 }
 
 enum Service: String, Identifiable {
     case spotify, appleMusic
     var id: Self { self }
-}
-
-enum TargetData {
-    case spotify([SpotifyMatchedSongs])
-    case appleMusic([MusicKitMatchedSongs])
 }
 
 @Observable class SyncController {
@@ -53,8 +49,5 @@ enum TargetData {
     var syncMatchingLimit: Double = 5.0
     var useAdvancedSync: Bool = false
     
-    var showSyncSheet: Bool = false
-    
-    var sourceData: [CommonSongData]?
-    var targetData: TargetData?
+    var addingPlaylist: Bool = false
 }
