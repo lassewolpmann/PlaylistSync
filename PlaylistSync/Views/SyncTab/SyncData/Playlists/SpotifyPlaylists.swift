@@ -13,7 +13,7 @@ struct SpotifyPlaylists: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 16) {
+            LazyHStack(spacing: 16) {
                 ForEach(playlists.items, id: \.self) { playlist in
                     VStack(spacing: 8) {
                         ZStack(alignment: .bottomLeading) {
