@@ -104,8 +104,8 @@ struct UserPlaylists: Decodable {
     var next: String?
     var offset: Int = 0
     var previous: String?
-    var total: Int = 2
-    var items: [UserPlaylists.Playlist] = [UserPlaylists.Playlist(), UserPlaylists.Playlist()]
+    var total: Int = 3
+    var items: [UserPlaylists.Playlist] = [UserPlaylists.Playlist(id: "preview_user_playlist_1"), UserPlaylists.Playlist(id: "preview_user_playlist_2"), UserPlaylists.Playlist(id: "preview_user_playlist_3")]
 }
 
 struct SpotifyPlaylist: Decodable {

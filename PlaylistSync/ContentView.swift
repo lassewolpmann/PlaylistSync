@@ -42,8 +42,5 @@ struct ContentView: View {
     let spotifyController = SpotifyController()
     let musicKitController = MusicKitController()
     
-    spotifyController.authSuccess = true
-    musicKitController.authSuccess = true
-    
     return ContentView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController())
 }

@@ -13,7 +13,10 @@ struct PlaylistSelection: View {
     var syncController: SyncController
     
     var body: some View {
-        NavigationLink {
+        VStack(alignment: .leading) {
+            Text("Choose Playlist")
+                .font(.headline)
+            
             switch syncController.selectedSource {
             case .spotify:
                 if spotifyController.authSuccess {
@@ -32,56 +35,38 @@ struct PlaylistSelection: View {
                     }
                 } else {
                     Label {
-                        Text("Authorize Spotify Access before choosing a Playlist!")
-                            .font(.headline)
+                        Text("Authorize Spotify in Settings for Playlist Access.")
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
-                    .symbolRenderingMode(.multicolor)
                     .labelStyle(HorizontalAlignedLabel())
-                    .padding()
                 }
-                
             case .appleMusic:
                 if musicKitController.authSuccess {
                     if let playlists = musicKitController.playlistOverview {
                         MusicKitPlaylists(musicKitController: musicKitController, playlists: playlists)
                     } else {
                         ProgressView {
-                            Text("Loading Apple Music Playlists")
+                            Text("Loading Spotify Playlists")
                         }.task {
                             musicKitController.playlistOverview = await musicKitController.getUserPlaylists()
                         }
                     }
                 } else {
                     Label {
-                        Text("Authorize Apple Music Access before choosing a Playlist!")
-                            .font(.headline)
+                        Text("Authorize Apple Music in Settings for Playlist Access.")
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
-                    .symbolRenderingMode(.multicolor)
                     .labelStyle(HorizontalAlignedLabel())
-                    .padding()
-                }
-                
-            }
-        } label: {
-            Label {
-                Text("Choose Playlist")
-            } icon: {
-                switch syncController.selectedSource {
-                case .spotify:
-                    Image("SpotifyIcon")
-                        .resizable()
-                        .scaledToFit()
-                case .appleMusic:
-                    Image("AppleMusicIcon")
-                        .resizable()
-                        .scaledToFit()
                 }
             }
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.regularMaterial)
+        )
     }
 }
 

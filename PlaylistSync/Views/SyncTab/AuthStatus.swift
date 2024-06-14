@@ -12,7 +12,10 @@ struct AuthStatus: View {
     var musicKitController: MusicKitController
     
     var body: some View {
-        Section {
+        VStack(alignment: .leading) {
+            Text("Status")
+                .font(.headline)
+            
             Label {
                 HStack {
                     Text("Spotify")
@@ -24,6 +27,7 @@ struct AuthStatus: View {
                 Image("SpotifyIcon")
                     .resizable()
                     .scaledToFit()
+                    .frame(height: 30)
             }
             
             Label {
@@ -37,15 +41,17 @@ struct AuthStatus: View {
                 Image("AppleMusicIcon")
                     .resizable()
                     .scaledToFit()
+                    .frame(height: 30)
             }
-        } header: {
-            Text("Status")
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.regularMaterial)
+        )
     }
 }
 
 #Preview {
-    List {
-        AuthStatus(spotifyController: SpotifyController(), musicKitController: MusicKitController())
-    }
+    AuthStatus(spotifyController: SpotifyController(), musicKitController: MusicKitController())
 }

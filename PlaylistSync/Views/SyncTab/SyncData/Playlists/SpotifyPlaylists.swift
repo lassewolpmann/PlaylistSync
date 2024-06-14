@@ -12,18 +12,59 @@ struct SpotifyPlaylists: View {
     let playlists: UserPlaylists
 
     var body: some View {
-        List(playlists.items, id: \.self, selection: $spotifyController.selectedPlaylist) { playlist in
-            let name = playlist.name
-            let author = playlist.owner.display_name ?? ""
-            let imageURL = playlist.images.first?.url ?? ""
-            
-            ItemLabel(
-                name: name,
-                author: author,
-                imageURL: imageURL
-            )
+        ScrollView(.horizontal) {
+            HStack(spacing: 16) {
+                ForEach(playlists.items, id: \.self) { playlist in
+                    VStack(spacing: 8) {
+                        ZStack(alignment: .bottomLeading) {
+                            PlaylistSelectionImage(url: playlist.images.first?.url ?? "")
+                        
+                            VStack(alignment: .leading) {
+                                Text(playlist.name)
+                                    .font(.headline)
+                                
+                                if let creator = playlist.owner.display_name {
+                                    Text(creator)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Button {
+                                    spotifyController.selectedPlaylist = playlist
+                                } label: {
+                                    if (spotifyController.selectedPlaylist == playlist) {
+                                        Label {
+                                            Text("Selected")
+                                        } icon: {
+                                            Image(systemName: "checkmark.circle")
+                                        }
+                                    } else {
+                                        Label {
+                                            Text("Select")
+                                        } icon: {
+                                            Image(systemName: "circle")
+                                        }
+                                    }
+                                }
+                                .padding(.top, 10)
+                            }
+                            .padding()
+                        }
+                        .containerRelativeFrame(.horizontal)
+                        .clipShape(.rect(cornerRadius: 32))
+                    }
+                    .scrollTransition(
+                        axis: .horizontal
+                    ) { content, phase in
+                        content
+                            .opacity(1 - (abs(phase.value) * 0.8))
+                    }
+                }
+            }
+            .scrollTargetLayout()
         }
-        .navigationTitle("Your Spotify Playlists")
+        .contentMargins(.horizontal, 32)
+        .scrollTargetBehavior(.paging)
     }
 }
 

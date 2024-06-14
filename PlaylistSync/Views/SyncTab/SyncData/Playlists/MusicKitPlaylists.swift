@@ -13,18 +13,59 @@ struct MusicKitPlaylists: View {
     let playlists: MusicItemCollection<Playlist>
     
     var body: some View {
-        List(playlists, id: \.self, selection: $musicKitController.selectedPlaylist) { playlist in
-            let name = playlist.name
-            let author = playlist.curatorName ?? ""
-            let imageURL = playlist.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
-            
-            ItemLabel(
-                name: name,
-                author: author,
-                imageURL: imageURL
-            )
+        ScrollView(.horizontal) {
+            HStack(spacing: 16) {
+                ForEach(playlists, id: \.self) { playlist in
+                    VStack(spacing: 8) {
+                        ZStack(alignment: .bottomLeading) {
+                            PlaylistSelectionImage(url: playlist.artwork?.url(width: 1024, height: 1024)?.absoluteString ?? "")
+                        
+                            VStack(alignment: .leading) {
+                                Text(playlist.name)
+                                    .font(.headline)
+                                
+                                if let creator = playlist.curatorName {
+                                    Text(creator)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                Button {
+                                    musicKitController.selectedPlaylist = playlist
+                                } label: {
+                                    if (musicKitController.selectedPlaylist == playlist) {
+                                        Label {
+                                            Text("Selected")
+                                        } icon: {
+                                            Image(systemName: "checkmark.circle")
+                                        }
+                                    } else {
+                                        Label {
+                                            Text("Select")
+                                        } icon: {
+                                            Image(systemName: "circle")
+                                        }
+                                    }
+                                }
+                                .padding(.top, 10)
+                            }
+                            .padding()
+                        }
+                        .containerRelativeFrame(.horizontal)
+                        .clipShape(.rect(cornerRadius: 32))
+                    }
+                    .scrollTransition(
+                        axis: .horizontal
+                    ) { content, phase in
+                        content
+                            .opacity(1 - (abs(phase.value) * 0.8))
+                    }
+                }
+            }
+            .scrollTargetLayout()
         }
-        .navigationTitle("Your Apple Music Playlists")
+        .contentMargins(.horizontal, 32)
+        .scrollTargetBehavior(.paging)
     }
 }
 
