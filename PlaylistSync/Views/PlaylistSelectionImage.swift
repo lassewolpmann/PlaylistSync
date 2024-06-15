@@ -11,66 +11,53 @@ struct PlaylistSelectionImage: View {
     @Environment(\.colorScheme) var colorScheme
 
     let url: String
+    let name: String
+    let author: String
+    
     var body: some View {
-        AsyncImage(url: URL(string: url)) { image in
-            image
-                .resizable()
-                .scaledToFit()
-                .blur(radius: 5)
-                .clipped()
-                .overlay {
-                    if (colorScheme == .dark) {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.5),
-                                Gradient.Stop(color: .black.opacity(0.8), location: 0.5),
-                                Gradient.Stop(color: .black.opacity(0.7), location: 1)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    } else {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.5),
-                                Gradient.Stop(color: .white.opacity(0.8), location: 0.5),
-                                Gradient.Stop(color: .white.opacity(0.7), location: 1)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+        let cornerRadius = 15.0
+        Rectangle()
+            .fill(.tertiary)
+            .aspectRatio(1.0, contentMode: .fit)
+            .containerRelativeFrame(.horizontal)
+            .overlay {
+                ZStack(alignment: .bottomLeading) {
+                    AsyncImage(url: URL(string: url)) { image in
+                        image
+                            .resizable()
+                            .blur(radius: 10.0)
+                            .clipped()
+                    } placeholder: {
+                        ProgressView {
+                            Text("Loading Image")
+                        }
                     }
-                }
-        } placeholder: {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(.primary)
-                .overlay {
-                    if (colorScheme == .dark) {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.5),
-                                Gradient.Stop(color: .black.opacity(0.8), location: 0.5),
-                                Gradient.Stop(color: .black.opacity(0.7), location: 1)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    } else {
-                        LinearGradient(
-                            stops: [
-                                Gradient.Stop(color: .clear, location: 0.5),
-                                Gradient.Stop(color: .white.opacity(0.8), location: 0.5),
-                                Gradient.Stop(color: .white.opacity(0.7), location: 1)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                    
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(color: .clear, location: 0),
+                            Gradient.Stop(color: .primary, location: 0.8)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    
+                    VStack(alignment: .leading) {
+                        Text(name)
+                            .font(.headline)
+                        
+                        Text(author)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
+                    .padding()
+                    .foregroundStyle(colorScheme == .dark ? .black : .white)
                 }
-        }
+            }
+            .clipShape(.rect(cornerRadius: cornerRadius))
     }
 }
 
 #Preview {
-    PlaylistSelectionImage(url: "")
+    PlaylistSelectionImage(url: "", name: "", author: "")
 }

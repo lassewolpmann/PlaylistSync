@@ -13,45 +13,28 @@ struct SpotifyPlaylists: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            LazyHStack(spacing: 16) {
+            LazyHStack(spacing: 22) {
                 ForEach(playlists.items, id: \.self) { playlist in
-                    VStack(spacing: 8) {
-                        ZStack(alignment: .bottomLeading) {
-                            PlaylistSelectionImage(url: playlist.images.first?.url ?? "")
+                    VStack(spacing: 10) {
+                        PlaylistSelectionImage(url: playlist.images.first?.url ?? "", name: playlist.name, author: playlist.owner.display_name ?? "")
                         
-                            VStack(alignment: .leading) {
-                                Text(playlist.name)
-                                    .font(.headline)
-                                
-                                if let creator = playlist.owner.display_name {
-                                    Text(creator)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                        Button {
+                            spotifyController.selectedPlaylist = playlist
+                        } label: {
+                            if (spotifyController.selectedPlaylist == playlist) {
+                                Label {
+                                    Text("Selected")
+                                } icon: {
+                                    Image(systemName: "checkmark.circle")
                                 }
-                                
-                                Button {
-                                    spotifyController.selectedPlaylist = playlist
-                                } label: {
-                                    if (spotifyController.selectedPlaylist == playlist) {
-                                        Label {
-                                            Text("Selected")
-                                        } icon: {
-                                            Image(systemName: "checkmark.circle")
-                                        }
-                                    } else {
-                                        Label {
-                                            Text("Select")
-                                        } icon: {
-                                            Image(systemName: "circle")
-                                        }
-                                    }
+                            } else {
+                                Label {
+                                    Text("Select")
+                                } icon: {
+                                    Image(systemName: "circle")
                                 }
-                                .padding(.top, 10)
                             }
-                            .padding()
                         }
-                        .containerRelativeFrame(.horizontal)
-                        .clipShape(.rect(cornerRadius: 32))
                     }
                     .scrollTransition(
                         axis: .horizontal
@@ -63,7 +46,7 @@ struct SpotifyPlaylists: View {
             }
             .scrollTargetLayout()
         }
-        .contentMargins(.horizontal, 32)
+        .contentMargins(.horizontal, 44)
         .scrollTargetBehavior(.paging)
     }
 }
