@@ -8,20 +8,44 @@
 import SwiftUI
 
 struct PlaylistSelection: View {
-    var spotifyController: SpotifyController
-    var musicKitController: MusicKitController
+    @Bindable var spotifyController: SpotifyController
+    @Bindable var musicKitController: MusicKitController
     var syncController: SyncController
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Choose Playlist")
-                .font(.headline)
-            
+        VStack(alignment: .leading, spacing: 15) {
+            HStack {
+                Text("Choose Playlist")
+                    .font(.headline)
+                
+                Spacer()
+            }
+                        
             switch syncController.selectedSource {
             case .spotify:
                 if spotifyController.authSuccess {
                     if let playlists = spotifyController.playlistOverview {
-                        SpotifyPlaylists(spotifyController: spotifyController, playlists: playlists)
+                        LabeledContent {
+                            TextField("Search", text: $spotifyController.playlistOverviewFilter)
+                        } label: {
+                            Image(systemName: "magnifyingglass.circle")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 5)
+                        .padding(.horizontal, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.background)
+                        )
+                        
+                        let filteredPlaylists = playlists.items.filter { playlist in
+                            if (spotifyController.playlistOverviewFilter != "") {
+                                return playlist.name.lowercased().contains(spotifyController.playlistOverviewFilter.lowercased())
+                            } else {
+                                return true
+                            }
+                        }
+                        SpotifyPlaylists(spotifyController: spotifyController, playlists: filteredPlaylists)
                     } else {
                         ProgressView {
                             Text("Loading Spotify Playlists")
@@ -44,7 +68,28 @@ struct PlaylistSelection: View {
             case .appleMusic:
                 if musicKitController.authSuccess {
                     if let playlists = musicKitController.playlistOverview {
-                        MusicKitPlaylists(musicKitController: musicKitController, playlists: playlists)
+                        LabeledContent {
+                            TextField("Search", text: $musicKitController.playlistOverviewFilter)
+                        } label: {
+                            Image(systemName: "magnifyingglass.circle")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 5)
+                        .padding(.horizontal, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(.background)
+                        )
+                        
+                        let filteredPlaylists = playlists.filter { playlist in
+                            if (musicKitController.playlistOverviewFilter != "") {
+                                return playlist.name.lowercased().contains(musicKitController.playlistOverviewFilter.lowercased())
+                            } else {
+                                return true
+                            }
+                        }
+                        
+                        MusicKitPlaylists(musicKitController: musicKitController, playlists: filteredPlaylists)
                     } else {
                         ProgressView {
                             Text("Loading Spotify Playlists")
@@ -71,5 +116,9 @@ struct PlaylistSelection: View {
 }
 
 #Preview {
-    PlaylistSelection(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
+    let spotifyController = SpotifyController()
+    spotifyController.authSuccess = true
+    spotifyController.playlistOverview = UserPlaylists()
+    
+    return PlaylistSelection(spotifyController: spotifyController, musicKitController: MusicKitController(), syncController: SyncController())
 }

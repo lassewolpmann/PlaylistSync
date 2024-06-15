@@ -23,6 +23,7 @@ import AuthenticationServices
     var tokenRefreshDate: Date = Date()
     
     var playlistOverview: UserPlaylists?
+    var playlistOverviewFilter: String = ""
     var selectedPlaylist: UserPlaylists.Playlist?
     
     init() {

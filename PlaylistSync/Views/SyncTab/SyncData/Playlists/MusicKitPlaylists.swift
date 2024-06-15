@@ -10,11 +10,11 @@ import MusicKit
 
 struct MusicKitPlaylists: View {
     @Bindable var musicKitController: MusicKitController
-    let playlists: MusicItemCollection<Playlist>
+    let playlists: [Playlist]
     
     var body: some View {
         ScrollView(.horizontal) {
-            LazyHStack(spacing: 16) {
+            LazyHStack(spacing: 11) {
                 ForEach(playlists, id: \.self) { playlist in
                     VStack(spacing: 10) {
                         PlaylistSelectionImage(url: playlist.artwork?.url(width: 1024, height: 1024)?.absoluteString ?? "", name: playlist.name, author: playlist.curatorName ?? "")
@@ -36,6 +36,7 @@ struct MusicKitPlaylists: View {
                                 }
                             }
                         }
+                        .padding(.bottom, 10)
                     }
                     .scrollTransition(
                         axis: .horizontal
@@ -47,7 +48,7 @@ struct MusicKitPlaylists: View {
             }
             .scrollTargetLayout()
         }
-        .contentMargins(.horizontal, 32)
+        .contentMargins(.horizontal, 22)
         .scrollTargetBehavior(.paging)
     }
 }

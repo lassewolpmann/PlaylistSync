@@ -11,7 +11,9 @@ import Vision
 
 @Observable class MusicKitController {
     var authSuccess: Bool = false
+    
     var playlistOverview: MusicItemCollection<Playlist>?
+    var playlistOverviewFilter: String = ""
     var selectedPlaylist: Playlist?
     
     func authorize() async -> Void {

@@ -9,12 +9,12 @@ import SwiftUI
 
 struct SpotifyPlaylists: View {
     @Bindable var spotifyController: SpotifyController
-    let playlists: UserPlaylists
+    let playlists: [UserPlaylists.Playlist]
 
     var body: some View {
         ScrollView(.horizontal) {
-            LazyHStack(spacing: 22) {
-                ForEach(playlists.items, id: \.self) { playlist in
+            LazyHStack(spacing: 11) {
+                ForEach(playlists, id: \.self) { playlist in
                     VStack(spacing: 10) {
                         PlaylistSelectionImage(url: playlist.images.first?.url ?? "", name: playlist.name, author: playlist.owner.display_name ?? "")
                         
@@ -35,6 +35,7 @@ struct SpotifyPlaylists: View {
                                 }
                             }
                         }
+                        .padding(.bottom, 10)
                     }
                     .scrollTransition(
                         axis: .horizontal
@@ -46,14 +47,14 @@ struct SpotifyPlaylists: View {
             }
             .scrollTargetLayout()
         }
-        .contentMargins(.horizontal, 44)
+        .contentMargins(.horizontal, 22)
         .scrollTargetBehavior(.paging)
     }
 }
 
 #Preview {
     NavigationStack {
-        SpotifyPlaylists(spotifyController: SpotifyController(), playlists: UserPlaylists())
+        SpotifyPlaylists(spotifyController: SpotifyController(), playlists: UserPlaylists().items)
             .navigationTitle("Spotify")
     }
 }
