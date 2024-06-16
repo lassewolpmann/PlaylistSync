@@ -24,7 +24,7 @@ struct PlaylistSelectionImage: View {
     var body: some View {
         let cornerRadius = 15.0
         Rectangle()
-            .fill(.tertiary)
+            .fill(.thinMaterial)
             .aspectRatio(1.0, contentMode: .fit)
             .containerRelativeFrame(.horizontal)
             .overlay {
@@ -32,8 +32,8 @@ struct PlaylistSelectionImage: View {
                     AsyncImage(url: URL(string: url ?? "")) { image in
                         image
                             .resizable()
-                            .blur(radius: 10.0)
                             .clipped()
+                            .blur(radius: 3)
                     } placeholder: {
                         ProgressView {
                             Text("Loading Image")
@@ -41,9 +41,10 @@ struct PlaylistSelectionImage: View {
                     }
                     
                     LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: .clear, location: 0),
-                            Gradient.Stop(color: .primary, location: 0.8)
+                        colors: [
+                            .secondary.opacity(0),
+                            .secondary.opacity(0.7),
+                            .primary.opacity(1)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -64,28 +65,44 @@ struct PlaylistSelectionImage: View {
                         
                         Spacer()
                         
-                        Button {
-                            if let spotifyPlaylist {
-                                spotifyController.selectedPlaylist = spotifyPlaylist
-                            } else if let musicKitPlaylist {
-                                musicKitController.selectedPlaylist = musicKitPlaylist
-                            }
-                        } label: {
-                            if let spotifyPlaylist {
-                                Label {
-                                    Text(spotifyPlaylist == spotifyController.selectedPlaylist ? "Selected" : "Select")
-                                        .bold()
-                                } icon: {
-                                    Image(systemName: spotifyPlaylist == spotifyController.selectedPlaylist ? "checkmark.circle" : "circle")
+                        if let playlist = spotifyPlaylist {
+                            Button {
+                                spotifyController.selectedPlaylist = playlist
+                            } label: {
+                                if (playlist == spotifyController.selectedPlaylist) {
+                                    Label {
+                                        Text("Selected")
+                                    } icon: {
+                                        Image(systemName: "checkmark.circle")
+                                    }
+                                    .foregroundStyle(.green)
+                                } else {
+                                    Label {
+                                        Text("Select")
+                                    } icon: {
+                                        Image(systemName: "circle")
+                                    }
                                 }
-                            } else if let musicKitPlaylist {
-                                Label {
-                                    Text(musicKitPlaylist == musicKitController.selectedPlaylist ? "Selected" : "Select")
-                                        .bold()
-                                } icon: {
-                                    Image(systemName: musicKitPlaylist == musicKitController.selectedPlaylist ? "checkmark.circle" : "circle")
+                            }.bold()
+                        } else if let playlist = musicKitPlaylist {
+                            Button {
+                                musicKitController.selectedPlaylist = playlist
+                            } label: {
+                                if (playlist == musicKitController.selectedPlaylist) {
+                                    Label {
+                                        Text("Selected")
+                                    } icon: {
+                                        Image(systemName: "checkmark.circle")
+                                    }
+                                    .foregroundStyle(.green)
+                                } else {
+                                    Label {
+                                        Text("Select")
+                                    } icon: {
+                                        Image(systemName: "circle")
+                                    }
                                 }
-                            }
+                            }.bold()
                         }
                     }
                     .padding()

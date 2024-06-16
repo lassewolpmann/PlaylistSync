@@ -24,7 +24,7 @@ struct PlaylistSelection: View {
             switch syncController.selectedSource {
             case .spotify:
                 if spotifyController.authSuccess {
-                    if let playlists = spotifyController.playlistOverview {
+                    if spotifyController.playlistOverview != nil {
                         PlaylistsSeachFilter(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
                         
                         Playlists(spotifyController: spotifyController, musicKitController: musicKitController, spotifyPlaylists: spotifyController.filteredPlaylists)
@@ -49,7 +49,7 @@ struct PlaylistSelection: View {
                 }
             case .appleMusic:
                 if musicKitController.authSuccess {
-                    if let playlists = musicKitController.playlistOverview {
+                    if musicKitController.playlistOverview != nil {
                         PlaylistsSeachFilter(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
                         
                         Playlists(spotifyController: spotifyController, musicKitController: musicKitController, musicKitPlaylists: musicKitController.filteredPlaylists)

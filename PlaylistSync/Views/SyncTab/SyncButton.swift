@@ -11,44 +11,26 @@ struct SyncButton: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
     var syncController: SyncController
-    
+        
     var body: some View {
-        Section {
-            switch syncController.selectedSource {
+        NavigationLink {
+            SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
+        } label: {
+            switch syncController.selectedTarget {
             case .spotify:
-                if let selectedPlaylist = spotifyController.selectedPlaylist {
-                    let name = selectedPlaylist.name
-                    let author = selectedPlaylist.owner.display_name ?? ""
-                    let imageURL = selectedPlaylist.images.first?.url ?? ""
-                    
-                    ItemLabel(name: name, author: author, imageURL: imageURL)
-                }
+                Label("Sync Playlist to Spotify", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.headline)
             case .appleMusic:
-                if let selectedPlaylist = musicKitController.selectedPlaylist {
-                    let name = selectedPlaylist.name
-                    let author = selectedPlaylist.curatorName ?? ""
-                    let imageURL = selectedPlaylist.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
-                    
-                    ItemLabel(name: name, author: author, imageURL: imageURL)
-                }
+                Label("Sync Playlist to Apple Music", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.headline)
             }
-            
-            NavigationLink {
-                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-            } label: {
-                switch syncController.selectedTarget {
-                case .spotify:
-                    Label("Sync Playlist to Spotify", systemImage: "arrow.triangle.2.circlepath")
-                        .font(.headline)
-                case .appleMusic:
-                    Label("Sync Playlist to Apple Music", systemImage: "arrow.triangle.2.circlepath")
-                        .font(.headline)
-                }
-            }
-            .disabled(checkForDisabledButton())
-        } header: {
-            Text("Sync")
         }
+        .disabled(checkForDisabledButton())
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.regularMaterial)
+        )
     }
     
     func checkForDisabledButton() -> Bool {
@@ -84,7 +66,5 @@ struct SyncButton: View {
 }
 
 #Preview {
-    List {
-        SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
-    }
+    SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
 }

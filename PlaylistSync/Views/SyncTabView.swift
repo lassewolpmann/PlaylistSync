@@ -18,10 +18,11 @@ struct SyncTabView: View {
     var body: some View {
         NavigationStack {
             ScrollView(.vertical) {
-                VStack(alignment: .leading) {
+                VStack(alignment: .center) {
                     AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
                     DataSelection(syncController: syncController)
                     PlaylistSelection(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
+                    SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
                 }
             }
             .padding(.horizontal, 15)
