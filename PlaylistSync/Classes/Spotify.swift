@@ -26,6 +26,20 @@ import AuthenticationServices
     var playlistOverviewFilter: String = ""
     var selectedPlaylist: UserPlaylists.Playlist?
     
+    var filteredPlaylists: [UserPlaylists.Playlist] {
+        if let playlistOverview {
+            return playlistOverview.items.filter { playlist in
+                if playlistOverviewFilter != "" {
+                    return playlist.name.lowercased().contains(playlistOverviewFilter.lowercased())
+                } else {
+                    return true
+                }
+            }
+        } else {
+            return []
+        }
+    }
+    
     init() {
         codeVerifier = self.generateRandomString(length: 64)
         codeChallenge = self.generateCodeChallenge()

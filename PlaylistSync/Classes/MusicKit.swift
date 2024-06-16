@@ -16,6 +16,20 @@ import Vision
     var playlistOverviewFilter: String = ""
     var selectedPlaylist: Playlist?
     
+    var filteredPlaylists: [Playlist] {
+        if let playlistOverview {
+            return playlistOverview.filter { playlist in
+                if playlistOverviewFilter != "" {
+                    return playlist.name.lowercased().contains(playlistOverviewFilter.lowercased())
+                } else {
+                    return true
+                }
+            }
+        } else {
+            return []
+        }
+    }
+    
     func authorize() async -> Void {
         let auth = await MusicAuthorization.request()
         authSuccess = auth == .authorized

@@ -26,18 +26,6 @@ struct SyncTabView: View {
             }
             .padding(.horizontal, 15)
             .navigationTitle("Sync")
-            
-            /*
-            List {
-                AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
-                
-                SyncData(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-                
-                SyncSettings(syncController: syncController)
-                SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-            }
-            .navigationTitle("Sync")
-             */
         }
     }
 }

@@ -25,27 +25,9 @@ struct PlaylistSelection: View {
             case .spotify:
                 if spotifyController.authSuccess {
                     if let playlists = spotifyController.playlistOverview {
-                        LabeledContent {
-                            TextField("Search", text: $spotifyController.playlistOverviewFilter)
-                        } label: {
-                            Image(systemName: "magnifyingglass.circle")
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.vertical, 5)
-                        .padding(.horizontal, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.background)
-                        )
+                        PlaylistsSeachFilter(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
                         
-                        let filteredPlaylists = playlists.items.filter { playlist in
-                            if (spotifyController.playlistOverviewFilter != "") {
-                                return playlist.name.lowercased().contains(spotifyController.playlistOverviewFilter.lowercased())
-                            } else {
-                                return true
-                            }
-                        }
-                        SpotifyPlaylists(spotifyController: spotifyController, playlists: filteredPlaylists)
+                        Playlists(spotifyController: spotifyController, musicKitController: musicKitController, spotifyPlaylists: spotifyController.filteredPlaylists)
                     } else {
                         ProgressView {
                             Text("Loading Spotify Playlists")
@@ -68,31 +50,12 @@ struct PlaylistSelection: View {
             case .appleMusic:
                 if musicKitController.authSuccess {
                     if let playlists = musicKitController.playlistOverview {
-                        LabeledContent {
-                            TextField("Search", text: $musicKitController.playlistOverviewFilter)
-                        } label: {
-                            Image(systemName: "magnifyingglass.circle")
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.vertical, 5)
-                        .padding(.horizontal, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.background)
-                        )
+                        PlaylistsSeachFilter(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
                         
-                        let filteredPlaylists = playlists.filter { playlist in
-                            if (musicKitController.playlistOverviewFilter != "") {
-                                return playlist.name.lowercased().contains(musicKitController.playlistOverviewFilter.lowercased())
-                            } else {
-                                return true
-                            }
-                        }
-                        
-                        MusicKitPlaylists(musicKitController: musicKitController, playlists: filteredPlaylists)
+                        Playlists(spotifyController: spotifyController, musicKitController: musicKitController, musicKitPlaylists: musicKitController.filteredPlaylists)
                     } else {
                         ProgressView {
-                            Text("Loading Spotify Playlists")
+                            Text("Loading Apple Music Playlists")
                         }.task {
                             musicKitController.playlistOverview = await musicKitController.getUserPlaylists()
                         }
