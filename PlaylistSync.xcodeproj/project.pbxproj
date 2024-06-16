@@ -137,7 +137,6 @@
 				25EA7D812C18266000E7FDB8 /* SyncTabView.swift */,
 				259187E42BFF1205002D03EF /* SettingsTabView.swift */,
 				259187E82BFF1FE0002D03EF /* ItemLabel.swift */,
-				25F5B94D2C1CB1B300C44767 /* PlaylistSelectionImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,6 +152,7 @@
 		25D6FB2C2C1C0C34000CB9BD /* SyncData */ = {
 			isa = PBXGroup;
 			children = (
+				25F5B94D2C1CB1B300C44767 /* PlaylistSelectionImage.swift */,
 				252E5E512C1AC072000526B2 /* Playlists.swift */,
 				25D6FB2D2C1C0C42000CB9BD /* PlaylistSelection.swift */,
 				25F5B94F2C1CB27700C44767 /* DataSelection.swift */,
