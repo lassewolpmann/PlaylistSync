@@ -26,6 +26,7 @@ struct Playlists: View {
                             ) { content, phase in
                                 content
                                     .opacity(1 - (abs(phase.value) * 0.8))
+                                    .scaleEffect(1 - abs(phase.value / 2))
                             }
                     }
                 } else if let musicKitPlaylists {

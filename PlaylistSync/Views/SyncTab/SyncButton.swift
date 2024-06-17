@@ -16,15 +16,30 @@ struct SyncButton: View {
         NavigationLink {
             SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
         } label: {
-            switch syncController.selectedTarget {
-            case .spotify:
-                Label("Sync Playlist to Spotify", systemImage: "arrow.triangle.2.circlepath")
-                    .font(.headline)
-            case .appleMusic:
-                Label("Sync Playlist to Apple Music", systemImage: "arrow.triangle.2.circlepath")
-                    .font(.headline)
+            Label {
+                HStack {
+                    switch syncController.selectedTarget {
+                    case .spotify:
+                        Text("Sync Playlist to Spotify")
+                        Image("SpotifyIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .padding(.leading, 5)
+                    case .appleMusic:
+                        Text("Sync Playlist to Apple Music")
+                        Image("AppleMusicIcon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                            .padding(.leading, 5)
+                    }
+                }
+            } icon: {
+                Image(systemName: "arrow.triangle.2.circlepath")
             }
         }
+        .font(.headline)
         .disabled(checkForDisabledButton())
         .padding()
         .background(

@@ -45,7 +45,6 @@ struct PlaylistSelection: View {
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
-                    .labelStyle(HorizontalAlignedLabel())
                 }
             case .appleMusic:
                 if musicKitController.authSuccess {
@@ -66,10 +65,11 @@ struct PlaylistSelection: View {
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
-                    .labelStyle(HorizontalAlignedLabel())
                 }
             }
         }
+        .labelStyle(HorizontalAlignedLabel())
+        .symbolRenderingMode(.multicolor)
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)
@@ -80,7 +80,7 @@ struct PlaylistSelection: View {
 
 #Preview {
     let spotifyController = SpotifyController()
-    spotifyController.authSuccess = true
+    spotifyController.authSuccess = false
     spotifyController.playlistOverview = UserPlaylists()
     
     return PlaylistSelection(spotifyController: spotifyController, musicKitController: MusicKitController(), syncController: SyncController())

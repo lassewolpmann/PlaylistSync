@@ -22,9 +22,7 @@ struct PlaylistSelectionImage: View {
     @State var author: String?
     
     var body: some View {
-        let cornerRadius = 15.0
         Rectangle()
-            .fill(.thinMaterial)
             .aspectRatio(1.0, contentMode: .fit)
             .containerRelativeFrame(.horizontal)
             .overlay {
@@ -33,22 +31,24 @@ struct PlaylistSelectionImage: View {
                         image
                             .resizable()
                             .clipped()
-                            .blur(radius: 3)
                     } placeholder: {
                         ProgressView {
                             Text("Loading Image")
                         }
                     }
                     
-                    LinearGradient(
-                        colors: [
-                            .secondary.opacity(0),
-                            .secondary.opacity(0.7),
-                            .primary.opacity(1)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                    Rectangle()
+                        .fill(.regularMaterial)
+                        .mask {
+                            LinearGradient(
+                                stops: [
+                                    Gradient.Stop(color: .clear, location: 0),
+                                    Gradient.Stop(color: .primary, location: 0.75)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
                     
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading) {
@@ -61,13 +61,16 @@ struct PlaylistSelectionImage: View {
                                     .foregroundStyle(.secondary)
                             }
                         }
-                        .foregroundStyle(colorScheme == .dark ? .black : .white)
                         
                         Spacer()
                         
                         if let playlist = spotifyPlaylist {
                             Button {
-                                spotifyController.selectedPlaylist = playlist
+                                if (spotifyController.selectedPlaylist == playlist) {
+                                    spotifyController.selectedPlaylist = nil
+                                } else {
+                                    spotifyController.selectedPlaylist = playlist
+                                }
                             } label: {
                                 if (playlist == spotifyController.selectedPlaylist) {
                                     Label {
@@ -86,7 +89,11 @@ struct PlaylistSelectionImage: View {
                             }.bold()
                         } else if let playlist = musicKitPlaylist {
                             Button {
-                                musicKitController.selectedPlaylist = playlist
+                                if (musicKitController.selectedPlaylist == playlist) {
+                                    musicKitController.selectedPlaylist = nil
+                                } else {
+                                    musicKitController.selectedPlaylist = playlist
+                                }
                             } label: {
                                 if (playlist == musicKitController.selectedPlaylist) {
                                     Label {
@@ -108,7 +115,7 @@ struct PlaylistSelectionImage: View {
                     .padding()
                 }
             }
-            .clipShape(.rect(cornerRadius: cornerRadius))
+            .clipShape(.rect(cornerRadius: 30))
             .onAppear {
                 if let spotifyPlaylist {
                     url = spotifyPlaylist.images.first?.url
