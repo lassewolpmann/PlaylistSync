@@ -45,6 +45,7 @@ struct PlaylistSelection: View {
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
+                    .symbolRenderingMode(.multicolor)
                 }
             case .appleMusic:
                 if musicKitController.authSuccess {
@@ -65,11 +66,11 @@ struct PlaylistSelection: View {
                     } icon: {
                         Image(systemName: "exclamationmark.triangle")
                     }
+                    .symbolRenderingMode(.multicolor)
                 }
             }
         }
         .labelStyle(HorizontalAlignedLabel())
-        .symbolRenderingMode(.multicolor)
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)

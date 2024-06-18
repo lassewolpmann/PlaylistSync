@@ -11,41 +11,45 @@ struct SyncButton: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
     var syncController: SyncController
+    
+    @State var showSettingsSheet = false
         
     var body: some View {
-        NavigationLink {
-            SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-        } label: {
-            Label {
-                HStack {
+        HStack {
+            NavigationLink {
+                SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
+            } label: {
+                Label {
                     switch syncController.selectedTarget {
                     case .spotify:
                         Text("Sync Playlist to Spotify")
-                        Image("SpotifyIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                            .padding(.leading, 5)
                     case .appleMusic:
                         Text("Sync Playlist to Apple Music")
-                        Image("AppleMusicIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                            .padding(.leading, 5)
                     }
+                } icon: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
                 }
-            } icon: {
-                Image(systemName: "arrow.triangle.2.circlepath")
+            }
+            .disabled(checkForDisabledButton())
+            
+            Divider()
+            
+            Button {
+                showSettingsSheet.toggle()
+            } label: {
+                Image(systemName: "gear")
             }
         }
         .font(.headline)
-        .disabled(checkForDisabledButton())
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)
                 .fill(.regularMaterial)
         )
+        .sheet(isPresented: $showSettingsSheet, content: {
+            SyncSettings(syncController: syncController)
+                .presentationDetents([.medium, .large])
+        })
     }
     
     func checkForDisabledButton() -> Bool {

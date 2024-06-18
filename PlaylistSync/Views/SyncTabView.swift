@@ -37,7 +37,7 @@ struct SyncTabView: View {
     
     spotifyController.authSuccess = true
     spotifyController.playlistOverview = UserPlaylists()
-    musicKitController.authSuccess = false
+    musicKitController.authSuccess = true
     
     return SyncTabView(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController())
 }

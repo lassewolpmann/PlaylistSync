@@ -40,12 +40,6 @@ import AuthenticationServices
         }
     }
     
-    init() {
-        codeVerifier = self.generateRandomString(length: 64)
-        codeChallenge = self.generateCodeChallenge()
-        state = self.generateRandomString(length: 64)
-    }
-    
     private func generateRandomString(length: Int) -> String {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         return String((0..<length).map{ _ in letters.randomElement()! })
@@ -68,6 +62,10 @@ import AuthenticationServices
     }
     
     func generateRequestURL() throws -> URL? {
+        codeVerifier = self.generateRandomString(length: 64)
+        codeChallenge = self.generateCodeChallenge()
+        state = self.generateRandomString(length: 64)
+        
         guard let challenge = self.codeChallenge else { throw SpotifyError.challengeError("Invalid Code Challenge") }
         
         var components = URLComponents(string: "https://accounts.spotify.com/authorize")

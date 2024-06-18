@@ -21,23 +21,10 @@ struct Playlists: View {
                 if let spotifyPlaylists {
                     ForEach(spotifyPlaylists, id: \.self) { playlist in
                         PlaylistSelectionImage(spotifyController: spotifyController, musicKitController: musicKitController, spotifyPlaylist: playlist)
-                            .scrollTransition(
-                                axis: .horizontal
-                            ) { content, phase in
-                                content
-                                    .opacity(1 - (abs(phase.value) * 0.8))
-                                    .scaleEffect(1 - abs(phase.value / 2))
-                            }
                     }
                 } else if let musicKitPlaylists {
                     ForEach(musicKitPlaylists, id: \.self) { playlist in
                         PlaylistSelectionImage(spotifyController: spotifyController, musicKitController: musicKitController, musicKitPlaylist: playlist)
-                            .scrollTransition(
-                                axis: .horizontal
-                            ) { content, phase in
-                                content
-                                    .opacity(1 - (abs(phase.value) * 0.8))
-                            }
                     }
                 }
             }

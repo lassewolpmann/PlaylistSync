@@ -78,7 +78,7 @@ import Vision
             // 45 is highest possible confidence score
             let maxConfidencePct = useAdvancedMatching ? (Double(maxConfidence) / 45) * 100 : (Double(maxConfidence) / 36) * 100
             
-            return SyncToMusicKit.MatchedSongs(sourceData: searchObject, matchedData: matchedSongs, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
+            return SyncToMusicKit.MatchedSongs(sourceData: searchObject, matchedData: matchedSongs, selectedSong: matchedSongs.first?.song, maxConfidence: maxConfidence, maxConfidencePct: maxConfidencePct)
         } catch {
             throw MusicKitError.matchingError("Could not match song")
         }
