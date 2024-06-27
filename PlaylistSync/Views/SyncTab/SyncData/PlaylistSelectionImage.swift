@@ -9,7 +9,8 @@ import SwiftUI
 import MusicKit
 
 struct PlaylistSelectionImage: View {
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @Bindable var spotifyController: SpotifyController
     @Bindable var musicKitController: MusicKitController
@@ -24,7 +25,12 @@ struct PlaylistSelectionImage: View {
     var body: some View {
         Rectangle()
             .aspectRatio(1.0, contentMode: .fit)
-            .containerRelativeFrame(.horizontal)
+            .containerRelativeFrame(
+                .horizontal,
+                count: horizontalSizeClass == .regular ? 2 : 1,
+                span: 1,
+                spacing: 11.0
+            )
             .overlay {
                 ZStack(alignment: .bottomLeading) {
                     AsyncImage(url: URL(string: url ?? "")) { image in
@@ -115,7 +121,7 @@ struct PlaylistSelectionImage: View {
                     .padding()
                 }
             }
-            .clipShape(.rect(cornerRadius: 30))
+            .clipShape(.rect(cornerRadius: 10))
             .onAppear {
                 if let spotifyPlaylist {
                     url = spotifyPlaylist.images.first?.url

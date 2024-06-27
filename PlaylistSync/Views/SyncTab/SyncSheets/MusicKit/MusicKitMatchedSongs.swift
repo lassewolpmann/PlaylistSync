@@ -16,26 +16,24 @@ struct MusicKitMatchedSongs: View {
     
     var body: some View {
         NavigationLink {
-            VStack(alignment: .leading) {
-                Button(role: .destructive) {
-                    selectedSong = nil
-                } label: {
-                    Label {
-                        Text("Don't match this song.")
-                    } icon: {
-                        Image(systemName: "waveform.slash")
-                    }
-                    .foregroundStyle(.red)
-                }
-                .padding()
-                .buttonStyle(.bordered)
+            List(matchedSongs, id: \.self.song, selection: $selectedSong) { matchedSong in
+                let name = matchedSong.song.title
+                let artist = matchedSong.song.artistName
+                let imageURL = matchedSong.song.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
                 
-                List(matchedSongs, id: \.self.song, selection: $selectedSong) { matchedSong in
-                    let name = matchedSong.song.title
-                    let artist = matchedSong.song.artistName
-                    let imageURL = matchedSong.song.artwork?.url(width: 640, height: 640)?.absoluteString ?? ""
-                    
-                    ItemLabel(name: name, author: artist, imageURL: imageURL)
+                ItemLabel(name: name, author: artist, imageURL: imageURL)
+            }
+            .toolbar {
+                ToolbarItem(placement: .destructiveAction) {
+                    Button(role: .destructive) {
+                        selectedSong = nil
+                    } label: {
+                        Label {
+                            Text("Ignore Match")
+                        } icon: {
+                            Image(systemName: "waveform.slash")
+                        }
+                    }
                 }
             }
             .navigationTitle("Alternatives")
@@ -64,5 +62,10 @@ struct MusicKitMatchedSongs: View {
 }
 
 #Preview {
-    MusicKitMatchedSongs(matchedSongs: [], selectedSongs: .constant([]))
+    NavigationStack {
+        List {
+            MusicKitMatchedSongs(matchedSongs: [], selectedSongs: .constant([]))
+        }
+        .navigationTitle("Alternatives")
+    }
 }

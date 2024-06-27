@@ -81,9 +81,6 @@ struct SyncToMusicKit: View {
                     }
                 }
             }
-            .toolbar {
-                EditButton()
-            }
         } else {
             ProgressView(value: Double(matchedData.count), total: Double(sourceData.count)) {
                 VStack(alignment: .leading) {
@@ -128,9 +125,7 @@ struct SyncToMusicKit: View {
 #Preview {
     var sourceData: [CommonSongData] = []
     
-    for _ in (1...3) {
-        sourceData.append(CommonSongData())
-    }
+    sourceData.append(CommonSongData())
     
     return NavigationStack {
         SyncToMusicKit(musicKitController: MusicKitController(), syncController: SyncController(), sourceData: sourceData, playlistName: "Preview Playlist", matchedData: [])

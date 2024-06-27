@@ -108,8 +108,6 @@ struct SyncSettings: View {
                     }
                     
                     Text("This settings changes the amount of songs the App searches for when trying to match the Playlist.")
-                    Text("Increasing this value does not have a big effect on the time it requires to do the search.")
-                    Text("It does have a big impact though, if used together with Advanced Sync.")
                 }
                 
                 VStack(alignment: .leading, spacing: 15) {
@@ -123,7 +121,6 @@ struct SyncSettings: View {
                     
                     Text("Enabling this option will enable some more advanced syncing methods like album image recognition.")
                     Text("This might return better results but also increases the amount of time the matching process will take.")
-                    Text("Advanced Sync works best on newer and more capable hardware.")
                 }
             }
             .padding()
