@@ -18,13 +18,15 @@ import Vision
     
     var filteredPlaylists: [Playlist] {
         if let playlistOverview {
-            return playlistOverview.filter { playlist in
+            let filteredPlaylists = playlistOverview.filter { playlist in
                 if playlistOverviewFilter != "" {
                     return playlist.name.lowercased().contains(playlistOverviewFilter.lowercased())
                 } else {
                     return true
                 }
             }
+            
+            return filteredPlaylists
         } else {
             return []
         }
@@ -35,15 +37,15 @@ import Vision
         authSuccess = auth == .authorized
     }
 
-    func getUserPlaylists() async -> MusicItemCollection<Playlist> {
+    func getUserPlaylists() async -> Void {
         let request = MusicLibraryRequest<Playlist>()
         
         do {
             let playlists = try await request.response()
-            return playlists.items
+            self.selectedPlaylist = playlists.items.first
+            self.playlistOverview = playlists.items
         } catch {
             print(error)
-            return [] as MusicItemCollection<Playlist>
         }
     }
     

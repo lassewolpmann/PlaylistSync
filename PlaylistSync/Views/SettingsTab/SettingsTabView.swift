@@ -41,6 +41,8 @@ struct SettingsTabView: View {
                         }
                         
                     }
+                } header: {
+                    Text("Authorization")
                 }
                 .onChange(of: spotifyAuthInProgress) { oldValue, newValue in
                     if (newValue == true) {
@@ -72,7 +74,7 @@ struct SettingsTabView: View {
                     }
                 }
             }
-            .navigationTitle("Authorization")
+            .navigationTitle("Settings")
         }
     }
 }

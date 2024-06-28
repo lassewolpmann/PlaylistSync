@@ -45,5 +45,7 @@ struct ItemLabel: View {
 }
 
 #Preview {
-    ItemLabel(name: "", author: "", imageURL: "")
+    let playlist = UserPlaylists().items.first
+    
+    return ItemLabel(name: playlist?.name ?? "", author: playlist?.owner.display_name ?? "", imageURL: playlist?.images.first?.url ?? "")
 }

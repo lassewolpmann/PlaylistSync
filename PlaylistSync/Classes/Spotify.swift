@@ -28,13 +28,15 @@ import AuthenticationServices
     
     var filteredPlaylists: [UserPlaylists.Playlist] {
         if let playlistOverview {
-            return playlistOverview.items.filter { playlist in
+            let filteredPlaylists = playlistOverview.items.filter { playlist in
                 if playlistOverviewFilter != "" {
                     return playlist.name.lowercased().contains(playlistOverviewFilter.lowercased())
                 } else {
                     return true
                 }
             }
+            
+            return filteredPlaylists
         } else {
             return []
         }
@@ -133,7 +135,7 @@ import AuthenticationServices
         }
     }
     
-    func getUserPlaylists() async throws -> UserPlaylists {
+    func getUserPlaylists() async throws -> Void {
         guard let access_token = self.authData?.access_token else { throw SpotifyError.authError("No Access Token available.") }
         
         var components = URLComponents(string: "https://api.spotify.com/v1/me/playlists")
@@ -153,8 +155,8 @@ import AuthenticationServices
         
         if (statusCode == 200) {
             let userPlaylists = try JSONDecoder().decode(UserPlaylists.self, from: data)
-            
-            return userPlaylists
+            self.selectedPlaylist = userPlaylists.items.first
+            self.playlistOverview = userPlaylists
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)
             throw SpotifyError.dataError("Could not get User Playlists")

@@ -20,18 +20,37 @@ struct SyncButton: View {
                 SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
             } label: {
                 Label {
-                    switch syncController.selectedTarget {
-                    case .spotify:
-                        Text("Sync Playlist to Spotify")
-                    case .appleMusic:
-                        Text("Sync Playlist to Apple Music")
+                    HStack(alignment: .center) {
+                        switch syncController.selectedSource {
+                        case .spotify:
+                            Text(spotifyController.selectedPlaylist?.name ?? "Playlist")
+                        case .appleMusic:
+                            Text(musicKitController.selectedPlaylist?.name ?? "Playlist")
+                        }
+                        
+                        Image(systemName: "arrowshape.right")
+                        
+                        switch syncController.selectedTarget {
+                        case .spotify:
+                            Image("SpotifyIcon")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 30)
+                        case .appleMusic:
+                            Image("AppleMusicIcon")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 30)
+                        }
                     }
                 } icon: {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
             }
+            .labelStyle(HorizontalAlignedLabel())
             .disabled(checkForDisabledButton())
             
+            Spacer()
             Divider()
             
             Button {
