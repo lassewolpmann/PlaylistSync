@@ -42,7 +42,6 @@ import Vision
         
         do {
             let playlists = try await request.response()
-            self.selectedPlaylist = playlists.items.first
             self.playlistOverview = playlists.items
         } catch {
             print(error)

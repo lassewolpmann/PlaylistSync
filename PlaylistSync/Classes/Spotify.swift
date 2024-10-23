@@ -155,7 +155,6 @@ import AuthenticationServices
         
         if (statusCode == 200) {
             let userPlaylists = try JSONDecoder().decode(UserPlaylists.self, from: data)
-            self.selectedPlaylist = userPlaylists.items.first
             self.playlistOverview = userPlaylists
         } else {
             let _ = try JSONDecoder().decode(GenericError.self, from: data)

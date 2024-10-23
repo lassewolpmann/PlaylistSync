@@ -7,14 +7,15 @@
 
 import SwiftUI
 
-struct PlaylistsSeachFilter: View {
+struct PlaylistsSearchFilter: View {
     @Bindable var spotifyController: SpotifyController
     @Bindable var musicKitController: MusicKitController
-    var syncController: SyncController
+    
+    let source: Service
     
     var body: some View {
         LabeledContent {
-            switch syncController.selectedSource {
+            switch source {
             case .spotify:
                 TextField("Search", text: $spotifyController.playlistOverviewFilter)
             case .appleMusic:
@@ -34,5 +35,5 @@ struct PlaylistsSeachFilter: View {
 }
 
 #Preview {
-    PlaylistsSeachFilter(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
+    PlaylistsSearchFilter(spotifyController: SpotifyController(), musicKitController: MusicKitController(), source: .spotify)
 }

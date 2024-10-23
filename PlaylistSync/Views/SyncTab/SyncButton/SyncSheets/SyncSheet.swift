@@ -10,7 +10,9 @@ import SwiftUI
 struct SyncSheet: View {
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
-    var syncController: SyncController
+    
+    let source: Service
+    let target: Service
     
     @State var sourceData: [CommonSongData]?
     @State var playlistName: String = "Playlist"
@@ -18,7 +20,7 @@ struct SyncSheet: View {
     var body: some View {
         NavigationStack {
             if let sourceData {
-                switch syncController.selectedTarget {
+                switch target {
                 case .spotify:
                     SyncToSpotify()
                         .navigationTitle(playlistName)
@@ -34,7 +36,7 @@ struct SyncSheet: View {
         }
         .task {
             // Load tracks from selected Source and store them as CommonSongData
-            switch syncController.selectedSource {
+            switch source {
             case .spotify:
                 if let selectedPlaylist = spotifyController.selectedPlaylist {
                     do {
@@ -63,5 +65,5 @@ struct SyncSheet: View {
     let musicKitController = MusicKitController()
     let previewSongData = CommonSongData()
     
-    return SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: SyncController(), sourceData: [previewSongData])
+    return SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, source: .spotify, target: .appleMusic, sourceData: [previewSongData])
 }

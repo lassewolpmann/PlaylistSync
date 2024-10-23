@@ -12,6 +12,9 @@ struct SyncButton: View {
     var musicKitController: MusicKitController
     var syncController: SyncController
     
+    let source: Service
+    let target: Service
+    
     @State var showSettingsSheet = false
         
     var body: some View {
@@ -20,29 +23,7 @@ struct SyncButton: View {
                 SyncSheet(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
             } label: {
                 Label {
-                    HStack(alignment: .center) {
-                        switch syncController.selectedSource {
-                        case .spotify:
-                            Text(spotifyController.selectedPlaylist?.name ?? "Playlist")
-                        case .appleMusic:
-                            Text(musicKitController.selectedPlaylist?.name ?? "Playlist")
-                        }
-                        
-                        Image(systemName: "arrowshape.right")
-                        
-                        switch syncController.selectedTarget {
-                        case .spotify:
-                            Image("SpotifyIcon")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 30)
-                        case .appleMusic:
-                            Image("AppleMusicIcon")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 30)
-                        }
-                    }
+                    Text("Sync Playlist")
                 } icon: {
                     Image(systemName: "arrow.triangle.2.circlepath")
                 }
@@ -50,7 +31,6 @@ struct SyncButton: View {
             .labelStyle(HorizontalAlignedLabel())
             .disabled(checkForDisabledButton())
             
-            Spacer()
             Divider()
             
             Button {
@@ -77,7 +57,7 @@ struct SyncButton: View {
         var sameSourceAndTarget = true
         var playlistIsNil = true
         
-        switch syncController.selectedSource {
+        switch source {
         case .spotify:
             sourceDisabled = !spotifyController.authSuccess
             playlistIsNil = spotifyController.selectedPlaylist == nil
@@ -86,14 +66,14 @@ struct SyncButton: View {
             playlistIsNil = musicKitController.selectedPlaylist == nil
         }
         
-        switch syncController.selectedTarget {
+        switch target {
         case .spotify:
             targetDisabled = !spotifyController.authSuccess
         case .appleMusic:
             targetDisabled = !musicKitController.authSuccess
         }
         
-        sameSourceAndTarget = syncController.selectedSource == syncController.selectedTarget
+        sameSourceAndTarget = source == target
         
         if (sourceDisabled || targetDisabled || sameSourceAndTarget || playlistIsNil) {
             return true
@@ -104,5 +84,5 @@ struct SyncButton: View {
 }
 
 #Preview {
-    SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController())
+    SyncButton(spotifyController: SpotifyController(), musicKitController: MusicKitController(), syncController: SyncController(), source: .spotify, target: .appleMusic)
 }

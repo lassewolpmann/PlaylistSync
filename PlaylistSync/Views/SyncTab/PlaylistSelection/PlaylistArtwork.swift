@@ -11,6 +11,11 @@ import MusicKit
 struct PlaylistArtwork: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    @Bindable var spotifyController: SpotifyController
+    @Bindable var musicKitController: MusicKitController
+    
+    let source: Service
+    
     var spotifyPlaylist: UserPlaylists.Playlist?
     var musicKitPlaylist: Playlist?
     
@@ -47,14 +52,60 @@ struct PlaylistArtwork: View {
                             )
                         }
                     
-                    VStack(alignment: .leading) {
-                        Text(name ?? "")
-                            .font(.headline)
+                    HStack(alignment: .bottom) {
+                        VStack(alignment: .leading) {
+                            Text(name ?? "")
+                                .font(.headline)
+                            
+                            if let author {
+                                Text(author)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                         
-                        if let author {
-                            Text(author)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                        Spacer()
+                        
+                        Button {
+                            switch source {
+                            case .spotify:
+                                spotifyController.selectedPlaylist = spotifyPlaylist
+                            case .appleMusic:
+                                musicKitController.selectedPlaylist = musicKitPlaylist
+                            }
+                        } label: {
+                            switch source {
+                            case .spotify:
+                                if (spotifyController.selectedPlaylist == spotifyPlaylist) {
+                                    Label {
+                                        Text("Selected")
+                                    } icon: {
+                                        Image(systemName: "checkmark.circle")
+                                    }
+                                    .foregroundStyle(.green)
+                                } else {
+                                    Label {
+                                        Text("Select")
+                                    } icon: {
+                                        Image(systemName: "circle")
+                                    }
+                                }
+                            case .appleMusic:
+                                if (musicKitController.selectedPlaylist == musicKitPlaylist) {
+                                    Label {
+                                        Text("Selected")
+                                    } icon: {
+                                        Image(systemName: "checkmark.circle")
+                                    }
+                                    .foregroundStyle(.green)
+                                } else {
+                                    Label {
+                                        Text("Select")
+                                    } icon: {
+                                        Image(systemName: "circle")
+                                    }
+                                }
+                            }
                         }
                     }
                     .padding()
@@ -76,7 +127,11 @@ struct PlaylistArtwork: View {
 }
 
 #Preview {
+    let spotifyController = SpotifyController()
+    spotifyController.authSuccess = true
+    spotifyController.playlistOverview = UserPlaylists()
+    
     let playlist = UserPlaylists.Playlist()
     
-    return PlaylistArtwork(spotifyPlaylist: playlist)
+    return PlaylistArtwork(spotifyController: spotifyController, musicKitController: MusicKitController(), source: .spotify, spotifyPlaylist: playlist)
 }

@@ -37,14 +37,15 @@ struct CommonSongData: Hashable {
     }
 }
 
-enum Service: String, Identifiable {
-    case spotify, appleMusic
+enum Service: String, Identifiable, CaseIterable {
+    case spotify = "Spotify"
+    case appleMusic = "Apple Music"
     var id: Self { self }
 }
 
 @Observable class SyncController {
-    var selectedSource: Service = .spotify
-    var selectedTarget: Service = .appleMusic
+    var selectedSource: Service?
+    var selectedTarget: Service?
     
     var syncMatchingLimit: Double = 5.0
     var useAdvancedSync: Bool = false

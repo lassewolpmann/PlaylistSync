@@ -9,20 +9,21 @@ import SwiftUI
 import MusicKit
 
 struct SyncTabView: View {
-    @Environment(\.colorScheme) var colorScheme
-    
     var spotifyController: SpotifyController
     var musicKitController: MusicKitController
-    @Bindable var syncController: SyncController
+    var syncController: SyncController
     
     var body: some View {
         NavigationStack {
             ScrollView(.vertical) {
                 VStack(alignment: .center) {
-                    AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
+                    // AuthStatus(spotifyController: spotifyController, musicKitController: musicKitController)
                     DataSelection(syncController: syncController)
-                    PlaylistSelection(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
-                    SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController)
+                    
+                    if let source = syncController.selectedSource, let target = syncController.selectedTarget {
+                        PlaylistSelection(spotifyController: spotifyController, musicKitController: musicKitController, source: source)
+                        SyncButton(spotifyController: spotifyController, musicKitController: musicKitController, syncController: syncController, source: source, target: target)
+                    }
                 }
             }
             .padding(.horizontal, 15)
